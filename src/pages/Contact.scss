@@ -1,0 +1,111 @@
+@use "../styles/tokens.scss";
+
+.ms-contact-page { background: var(--paper); }
+
+.ms-contact-hero {
+  background: var(--ink);
+  color: var(--bone);
+  padding: clamp(150px, 18vw, 210px) 0 70px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(34px, 5.6vw, 58px);
+    margin-top: 16px;
+    em { font-style: italic; color: var(--gold-bright); }
+  }
+  p { margin-top: 16px; color: var(--bone-dim); max-width: 420px; font-size: 15px; line-height: 1.7; }
+}
+
+.ms-contact-layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(40px, 6vw, 100px);
+  padding: clamp(60px, 9vw, 110px) var(--gutter);
+
+  @media (max-width: 860px) { grid-template-columns: 1fr; }
+}
+
+.ms-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  > div { display: flex; flex-direction: column; gap: 6px; }
+  .eyebrow { margin-bottom: 4px; }
+  a, p { font-size: 16px; }
+  a { transition: color var(--dur-fast); }
+  a:hover { color: var(--gold-dim); }
+
+  &__muted { font-size: 13px !important; color: var(--sand-dim); }
+  &__socials { display: flex; gap: 18px; margin-top: 4px; }
+}
+
+.ms-contact-form-wrap { background: var(--paper-dim); padding: clamp(28px, 4vw, 48px); }
+
+.ms-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sand-dim);
+  }
+
+  input, textarea {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid #d9d0bd;
+    padding: 13px 14px;
+    resize: vertical;
+    transition: border-color var(--dur-fast);
+
+    &:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+  }
+
+  button { margin-top: 6px; align-self: flex-start; }
+
+  &__note {
+    font-size: 11px;
+    color: var(--sand-dim);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+}
+
+.ms-contact-success {
+  padding: 30px 0;
+  h3 { font-family: var(--font-display); font-size: 26px; font-style: italic; color: var(--gold-dim); }
+  p { margin-top: 12px; font-size: 14px; color: #463f30; line-height: 1.7; }
+}
+
+.ms-contact-map {
+  &__placeholder {
+    height: 360px;
+    background:
+      repeating-linear-gradient(45deg, var(--ink-soft), var(--ink-soft) 12px, var(--ink) 12px, var(--ink) 24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    span {
+      background: var(--ink);
+      color: var(--gold-bright);
+      padding: 14px 28px;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--gold);
+    }
+  }
+}

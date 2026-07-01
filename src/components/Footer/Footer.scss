@@ -1,0 +1,70 @@
+@use "../../styles/tokens.scss";
+
+.ms-footer {
+  background: var(--ink);
+  color: var(--bone-dim);
+  padding-top: 90px;
+
+
+  &__top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid var(--ink-line);
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__brand-text {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--bone);
+    em { color: var(--gold); font-style: italic; }
+  }
+
+  &__brand p {
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 320px;
+    color: var(--sand);
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    h4 { margin-bottom: 6px; }
+
+    a, p {
+      font-size: 14px;
+      color: var(--bone-dim);
+      transition: color var(--dur-fast) var(--ease-silk);
+      margin: 0;
+    }
+    a:hover { color: var(--gold-bright); }
+  }
+
+  &__socials {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    a { font-size: 12px; letter-spacing: 0.04em; border-bottom: 1px solid var(--ink-line); padding-bottom: 2px; }
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+    padding: 26px 0 60px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--sand-dim);
+  }
+}
