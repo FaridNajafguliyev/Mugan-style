@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
-import { products } from "../data/products";
+import { apiFetch } from "../lib/api";
+import { formatPrice } from "../lib/format";
+import type { Product } from "../lib/types";
 import "./Catalog.scss";
 
 const Catalog: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ products: Product[] }>("/products")
+      .then((data) => setProducts(data.products))
+      .catch(() => setProducts([]));
+  }, []);
 
   return (
     <div className="ms-catalog-page">
@@ -36,7 +45,7 @@ const Catalog: React.FC = () => {
               <div className="ms-cat-card__info">
                 <div className="ms-cat-card__meta">
                   <span>Размеры {p.sizes}</span>
-                  <span className="ms-cat-card__price">{p.price}</span>
+                  <span className="ms-cat-card__price">{formatPrice(p.priceKopecks, p.priceFrom)}</span>
                 </div>
               </div>
             </Link>

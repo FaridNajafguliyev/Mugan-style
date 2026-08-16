@@ -1,0 +1,116 @@
+@use "../styles/tokens.scss";
+
+.ms-track-page {
+  background: var(--paper);
+  min-height: 60vh;
+}
+
+.ms-track-hero {
+  background: var(--ink);
+  color: var(--bone);
+  padding: clamp(150px, 18vw, 210px) 0 70px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(34px, 5.6vw, 58px);
+    margin-top: 16px;
+    em {
+      font-style: italic;
+      color: var(--gold-bright);
+    }
+  }
+  p {
+    margin-top: 16px;
+    color: var(--bone-dim);
+    max-width: 420px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+
+.ms-track-layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(40px, 6vw, 100px);
+  padding: clamp(60px, 9vw, 110px) var(--gutter);
+  align-items: start;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ms-track-form-wrap {
+  background: var(--paper-dim);
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.ms-track-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sand-dim);
+  }
+
+  input {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid #d9d0bd;
+    padding: 13px 14px;
+    transition: border-color var(--dur-fast);
+
+    &:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+  }
+
+  button {
+    margin-top: 6px;
+    align-self: flex-start;
+  }
+
+  &__error {
+    font-size: 13px;
+    color: var(--red-square);
+  }
+}
+
+.ms-track-result {
+  background: var(--paper-dim);
+  padding: clamp(28px, 4vw, 48px);
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--ink);
+  }
+
+  &__date {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--sand-dim);
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 20px 0 24px;
+    font-size: 14px;
+    color: #463f30;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3dbc9;
+  }
+}

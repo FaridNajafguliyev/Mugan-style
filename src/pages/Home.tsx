@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
-import { products } from "../data/products";
+import { apiFetch } from "../lib/api";
+import { formatPrice } from "../lib/format";
+import type { Product } from "../lib/types";
 import "./Home.scss";
 
 const testimonials = [
@@ -24,7 +26,13 @@ const testimonials = [
 ];
 
 const Home: React.FC = () => {
-  const featured = products.slice(0, 3);
+  const [featured, setFeatured] = useState<Product[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ products: Product[] }>("/products?limit=3")
+      .then((data) => setFeatured(data.products))
+      .catch(() => setFeatured([]));
+  }, []);
 
   return (
     <>
@@ -119,7 +127,7 @@ const Home: React.FC = () => {
                     <span className="ms-product-card__tag">{p.categoryLabel}</span>
                   </div>
                   <div className="ms-product-card__info">
-                    <span>{p.price}</span>
+                    <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>
                   </div>
                 </Link>
               </Reveal>

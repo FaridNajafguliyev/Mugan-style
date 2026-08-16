@@ -1,0 +1,65 @@
+@use "../../styles/tokens.scss";
+
+.ms-order-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e3dbc9;
+    font-size: 16px;
+    color: var(--sand-dim);
+    transition: color var(--dur-fast);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.is-done {
+      color: var(--ink);
+    }
+  }
+
+  &__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid #d9d0bd;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  li.is-done &__mark {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--paper);
+  }
+
+  &--terminal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    color: var(--red-square);
+    padding: 20px 0;
+  }
+
+  &__terminal-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--red-square);
+    font-size: 13px;
+  }
+}

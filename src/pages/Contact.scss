@@ -1,6 +1,8 @@
 @use "../styles/tokens.scss";
 
-.ms-contact-page { background: var(--paper); }
+.ms-contact-page {
+  background: var(--paper);
+}
 
 .ms-contact-hero {
   background: var(--ink);
@@ -12,9 +14,18 @@
     font-weight: 500;
     font-size: clamp(34px, 5.6vw, 58px);
     margin-top: 16px;
-    em { font-style: italic; color: var(--gold-bright); }
+    em {
+      font-style: italic;
+      color: var(--gold-bright);
+    }
   }
-  p { margin-top: 16px; color: var(--bone-dim); max-width: 420px; font-size: 15px; line-height: 1.7; }
+  p {
+    margin-top: 16px;
+    color: var(--bone-dim);
+    max-width: 420px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
 }
 
 .ms-contact-layout {
@@ -23,7 +34,9 @@
   gap: clamp(40px, 6vw, 100px);
   padding: clamp(60px, 9vw, 110px) var(--gutter);
 
-  @media (max-width: 860px) { grid-template-columns: 1fr; }
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ms-contact-info {
@@ -31,17 +44,43 @@
   flex-direction: column;
   gap: 32px;
 
-  > div { display: flex; flex-direction: column; gap: 6px; }
-  .eyebrow { margin-bottom: 4px; }
-  a, p { font-size: 16px; }
-  a { transition: color var(--dur-fast); }
-  a:hover { color: var(--gold-dim); }
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .eyebrow {
+    margin-bottom: 4px;
+    margin-top: 24px;
+  }
+  a,
+  p {
+    font-size: 16px;
+  }
+  a {
+    transition: color var(--dur-fast);
+    color: var(--gold);
+    text-decoration: underline;
+  }
+  a:hover {
+    color: var(--ink);
+  }
 
-  &__muted { font-size: 13px !important; color: var(--sand-dim); }
-  &__socials { display: flex; gap: 18px; margin-top: 4px; }
+  &__muted {
+    font-size: 13px !important;
+    color: var(--sand-dim);
+  }
+  &__socials {
+    display: flex;
+    gap: 18px;
+    margin-top: 4px;
+  }
 }
 
-.ms-contact-form-wrap { background: var(--paper-dim); padding: clamp(28px, 4vw, 48px); }
+.ms-contact-form-wrap {
+  background: var(--paper-dim);
+  padding: clamp(28px, 4vw, 48px);
+}
 
 .ms-contact-form {
   display: flex;
@@ -58,7 +97,8 @@
     color: var(--sand-dim);
   }
 
-  input, textarea {
+  input,
+  textarea {
     font-family: var(--font-sans);
     font-size: 15px;
     color: var(--ink);
@@ -74,7 +114,10 @@
     }
   }
 
-  button { margin-top: 6px; align-self: flex-start; }
+  button {
+    margin-top: 6px;
+    align-self: flex-start;
+  }
 
   &__note {
     font-size: 11px;
@@ -82,19 +125,41 @@
     text-transform: none;
     letter-spacing: 0.02em;
   }
+
+  &__error {
+    font-size: 13px;
+    color: var(--red-square);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
 }
 
 .ms-contact-success {
   padding: 30px 0;
-  h3 { font-family: var(--font-display); font-size: 26px; font-style: italic; color: var(--gold-dim); }
-  p { margin-top: 12px; font-size: 14px; color: #463f30; line-height: 1.7; }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-style: italic;
+    color: var(--gold-dim);
+  }
+  p {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #463f30;
+    line-height: 1.7;
+  }
 }
 
 .ms-contact-map {
   &__placeholder {
     height: 360px;
-    background:
-      repeating-linear-gradient(45deg, var(--ink-soft), var(--ink-soft) 12px, var(--ink) 12px, var(--ink) 24px);
+    background: repeating-linear-gradient(
+      45deg,
+      var(--ink-soft),
+      var(--ink-soft) 12px,
+      var(--ink) 12px,
+      var(--ink) 24px
+    );
     display: flex;
     align-items: center;
     justify-content: center;

@@ -21,6 +21,7 @@ const Footer: React.FC = () => {
           <NavLink to="/catalog">Каталог</NavLink>
           <NavLink to="/about">О бренде</NavLink>
           <NavLink to="/contact">Контакты</NavLink>
+          <NavLink to="/track-order">Отследить заказ</NavLink>
         </div>
 
         <div className="ms-footer__col">
@@ -31,8 +32,10 @@ const Footer: React.FC = () => {
 
         <div className="ms-footer__col">
           <h4 className="eyebrow eyebrow--dark">Контакты</h4>
-          <a href="tel:+79265939880">+7 926 593 98 80</a>
-          <a href="tel:+79645939880">+7 964 593 98 80</a>
+          <a href="tel:+79265939880">МОБ: +7 926 593 98 80</a>
+          <a href="tel:+79645939880">МОБ: +7 964 593 98 80</a>
+          <a href="mailto:rafael-1969@mail.ru">ПОЧТА: rafael-1969@mail.ru</a>
+
           <div className="ms-footer__socials">
             <a href="#" aria-label="Instagram">Instagram</a>
             <a href="#" aria-label="WhatsApp">WhatsApp</a>
