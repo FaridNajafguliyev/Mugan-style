@@ -22,9 +22,29 @@ interface YooKassaPaymentResponse {
   confirmation?: { confirmation_url?: string };
 }
 
+/**
+ * Wraps a YooKassa fetch call so a network-level failure (DNS timeout,
+ * connection refused, no route — this network simply can't reach
+ * api.yookassa.ru) surfaces as the same clear AppError as a rejected
+ * request, instead of an uncaught TypeError that falls through to a bare
+ * "Internal server error".
+ */
+async function fetchYooKassa(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (err) {
+    console.error(`[yookassa] network error reaching ${url}:`, err);
+    throw new AppError(
+      "Не удалось связаться с платёжным сервисом. Проверьте подключение к интернету и попробуйте позже.",
+      502,
+      "PAYMENT_PROVIDER_UNREACHABLE",
+    );
+  }
+}
+
 export const yookassaProvider: PaymentProvider = {
   async createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult> {
-    const res = await fetch(`${API_BASE}/payments`, {
+    const res = await fetchYooKassa(`${API_BASE}/payments`, {
       method: "POST",
       headers: {
         Authorization: authHeader(),
@@ -59,7 +79,7 @@ export const yookassaProvider: PaymentProvider = {
   },
 
   async getPayment(providerPaymentId: string): Promise<GetPaymentResult> {
-    const res = await fetch(`${API_BASE}/payments/${providerPaymentId}`, {
+    const res = await fetchYooKassa(`${API_BASE}/payments/${providerPaymentId}`, {
       headers: { Authorization: authHeader() },
     });
 

@@ -13,6 +13,10 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# Admin-uploaded product images (local disk storage, not part of the repo)
+server/uploads/*
+!server/uploads/.gitkeep
+
 # Env files (keep .env.example tracked)
 .env
 .env.*

@@ -18,6 +18,36 @@ export interface Category {
   label: string;
 }
 
+export interface AdminProduct {
+  id: string;
+  categoryKey: string;
+  categoryLabel: string;
+  title: string;
+  material: string;
+  lining: string;
+  sizes: string;
+  priceKopecks: number;
+  priceFrom: boolean;
+  description: string;
+  images: string[];
+  isActive: boolean;
+  stock: number;
+  reserved: number;
+  available: number;
+}
+
+export interface ProductFormInput {
+  categoryKey: string;
+  title: string;
+  material: string;
+  lining: string;
+  sizes: string;
+  priceKopecks: number;
+  priceFrom: boolean;
+  description: string;
+  images: string[];
+}
+
 export const ORDER_STATUSES = [
   "PENDING_PAYMENT",
   "NEW",

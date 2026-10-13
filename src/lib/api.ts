@@ -16,11 +16,15 @@ interface ApiFetchOptions extends RequestInit {
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
   const { token, headers, ...rest } = options;
 
+  // Skip the default JSON header for FormData bodies (file uploads) — the
+  // browser must set its own multipart Content-Type with the boundary.
+  const isFormData = rest.body instanceof FormData;
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...rest,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
