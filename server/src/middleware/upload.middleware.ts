@@ -1,24 +1,12 @@
-import fs from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
 import multer from "multer";
-
-export const UPLOADS_DIR = path.join(import.meta.dirname, "../../uploads");
-
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${crypto.randomUUID()}${ext}`);
-  },
-});
-
+// Memory storage — files stay as an in-memory Buffer so upload.service.ts
+// can route them to Cloudinary or local disk uniformly, without multer
+// ever writing to disk itself.
 export const uploadImages = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 8 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {

@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import apiRoutes from "./routes/index.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.middleware.js";
-import { UPLOADS_DIR } from "./middleware/upload.middleware.js";
+import { LOCAL_UPLOADS_DIR } from "./services/upload.service.js";
 
 export function createApp() {
   const app = express();
@@ -13,7 +13,7 @@ export function createApp() {
   app.use(cookieParser());
   app.use(express.json());
 
-  app.use("/uploads", express.static(UPLOADS_DIR));
+  app.use("/uploads", express.static(LOCAL_UPLOADS_DIR));
   app.use("/api", apiRoutes);
 
   app.use(notFoundHandler);

@@ -90,18 +90,67 @@ server/                 бэкенд
 | POST | /api/auth/login, /refresh, /logout | публичный |
 | GET/PATCH | /api/orders, /api/inventory, /api/customers, /api/delivery, /api/dashboard/stats | админ/продавец (JWT) |
 
-## Сборка для продакшена
+## Хранение фото товаров (Cloudinary)
+
+По умолчанию загруженные в админке фото сохраняются на диск сервера
+(`server/uploads/`) — годится для разработки, но на большинстве хостингов
+(Render, Railway и т.д.) диск сбрасывается при каждом деплое, и фото
+пропадут. Чтобы этого не случилось, подключите Cloudinary (бесплатно):
+
+1. Зарегистрируйтесь на [cloudinary.com](https://cloudinary.com) (план Free,
+   карта не требуется).
+2. На Dashboard скопируйте **Cloud name**, **API Key**, **API Secret**.
+3. Впишите их в `server/.env`:
+   ```
+   CLOUDINARY_CLOUD_NAME=...
+   CLOUDINARY_API_KEY=...
+   CLOUDINARY_API_SECRET=...
+   ```
+4. Перезапустите бэкенд — с этого момента все новые загрузки идут в
+   Cloudinary автоматически (старые локальные фото продолжат работать).
+
+Если переменные не заданы — всё работает как раньше, через локальный диск.
+
+## Деплой на свой домен (например, mugan-style.com)
+
+Рекомендуемый вариант — три бесплатных/недорогих managed-сервиса, без
+настройки собственного VPS:
+
+| Часть | Сервис | Что сделать |
+|---|---|---|
+| База данных | [MongoDB Atlas](https://www.mongodb.com/atlas) | Создать бесплатный кластер (M0), получить `MONGODB_URI` |
+| Бэкенд (API) | [Render](https://render.com) | Новый **Web Service** из GitHub-репозитория, Root Directory `server`, Build `npm install && npm run build`, Start `npm start` |
+| Фронтенд | [Vercel](https://vercel.com) | Импортировать репозиторий, Root Directory — корень проекта, Framework — Vite |
+| Фото товаров | Cloudinary | См. раздел выше — обязательно для продакшена |
+| Домен | Любой регистратор (Namecheap, Reg.ru и т.п.) | Купить `mugan-style.com`, настроить DNS на Vercel/Render |
+
+### Шаги
+
+1. **MongoDB Atlas** — создать кластер, пользователя БД, разрешить доступ
+   (0.0.0.0/0 для простоты), скопировать connection string.
+2. **Render (бэкенд)** — создать Web Service, подключить GitHub-репозиторий,
+   задать все переменные из `server/.env` (включая `MONGODB_URI` с Atlas,
+   реальные `YOOKASSA_*`, `CLOUDINARY_*`, и `CLIENT_URL=https://mugan-style.com`).
+   После деплоя запустить один раз `npm run seed` и `npm run seed:admin`
+   (через Render Shell) — наполнит каталог и создаст первого админа.
+3. **Vercel (фронтенд)** — импортировать репозиторий, задать переменную
+   `VITE_API_URL=https://<ваш-бэкенд>.onrender.com/api`, задеплоить.
+4. **Домен** — купить `mugan-style.com`, в DNS добавить:
+   - `A`/`CNAME` на корень домена → Vercel (инструкция появится в настройках
+     проекта на Vercel после добавления домена)
+   - поддомен, например `api.mugan-style.com`, → Render (аналогично, в
+     настройках Render)
+5. Обновить в `server/.env` на Render: `CLIENT_URL=https://mugan-style.com`
+   и `YOOKASSA_RETURN_URL=https://mugan-style.com/order/:orderNumber/result`.
+6. В личном кабинете YooKassa указать боевой webhook:
+   `https://api.mugan-style.com/api/payments/webhook/yookassa`.
+
+### Локальная сборка (для проверки)
 
 ```bash
 npm run build            # фронтенд → dist/
 npm --prefix server run build   # бэкенд → server/dist/
 ```
-
-Фронтенд (`dist/`) разворачивается как статика (Vercel, Netlify и т.д.) с
-редиректом всех путей на `index.html`. Бэкенд (`server/dist/`) нужно
-разместить на Node-хостинге (Render, Railway, VPS) с переменными окружения
-из `server/.env` и подключением к MongoDB (локально или Atlas), а на
-фронтенде указать `VITE_API_URL` на адрес развёрнутого API.
 
 ## Где менять текст и контакты
 

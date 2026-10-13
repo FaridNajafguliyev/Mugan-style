@@ -19,6 +19,13 @@ const envSchema = z.object({
 
   ADMIN_SEED_EMAIL: z.string().optional(),
   ADMIN_SEED_PASSWORD: z.string().optional(),
+
+  // Optional — when unset, uploaded product photos fall back to local disk
+  // storage (fine for dev, but lost on redeploy on most PaaS hosts since
+  // their filesystem is ephemeral). Set all three to use Cloudinary instead.
+  CLOUDINARY_CLOUD_NAME: z.string().default(""),
+  CLOUDINARY_API_KEY: z.string().default(""),
+  CLOUDINARY_API_SECRET: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse(process.env);
