@@ -15,6 +15,7 @@ interface CartContextValue {
   addItem: (item: Omit<CartItem, "qty">, qty?: number) => void;
   removeItem: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
+  adjustQty: (id: string, delta: number) => void;
   clear: () => void;
   count: number;
   subtotalKopecks: number;
@@ -63,6 +64,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, Math.min(qty, i.available)) } : i)),
     );
 
+  // Computes the next quantity from the current state inside the updater,
+  // not from a value closed over at render time — so clicking +/- rapidly
+  // (faster than a re-render) still compounds correctly instead of
+  // collapsing every pending click onto the same next value.
+  const adjustQty = (id: string, delta: number) =>
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, Math.min(i.qty + delta, i.available)) } : i)),
+    );
+
   const clear = () => setItems([]);
 
   const count = useMemo(() => items.reduce((sum, i) => sum + i.qty, 0), [items]);
@@ -78,6 +88,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addItem,
         removeItem,
         updateQty,
+        adjustQty,
         clear,
         count,
         subtotalKopecks,

@@ -5,7 +5,7 @@ import { formatPrice } from "../../lib/format";
 import "./CartDrawer.scss";
 
 const CartDrawer: React.FC = () => {
-  const { items, isOpen, close, removeItem, updateQty, subtotalKopecks } = useCart();
+  const { items, isOpen, close, removeItem, adjustQty, subtotalKopecks } = useCart();
 
   return (
     <>
@@ -32,7 +32,7 @@ const CartDrawer: React.FC = () => {
                     </span>
                     <div className="ms-cart-drawer__item-qty">
                       <button
-                        onClick={() => updateQty(item.id, item.qty - 1)}
+                        onClick={() => adjustQty(item.id, -1)}
                         disabled={item.qty <= 1}
                         aria-label="Уменьшить количество"
                       >
@@ -40,7 +40,7 @@ const CartDrawer: React.FC = () => {
                       </button>
                       <span>{item.qty}</span>
                       <button
-                        onClick={() => updateQty(item.id, item.qty + 1)}
+                        onClick={() => adjustQty(item.id, 1)}
                         disabled={item.qty >= item.available}
                         aria-label="Увеличить количество"
                       >

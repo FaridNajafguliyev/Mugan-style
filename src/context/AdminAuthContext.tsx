@@ -20,14 +20,21 @@ interface AdminAuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   authFetch: <T>(path: string, options?: RequestInit) => Promise<T>;
+  ensureSessionChecked: () => Promise<void>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
+const isAdminPath = () => window.location.pathname.startsWith("/admin");
+
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AdminUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Only the admin panel ever needs a session — starting this true on public
+  // pages would mean every visitor's browser fires a doomed /auth/refresh
+  // on load. Admin routes still get a correct `loading` via ensureSessionChecked.
+  const [loading, setLoading] = useState(isAdminPath);
   const accessTokenRef = useRef<string | null>(null);
+  const checkPromiseRef = useRef<Promise<void> | null>(null);
 
   const restoreSession = useCallback(() => {
     return apiFetch<LoginResponse>("/auth/refresh", { method: "POST" })
@@ -43,9 +50,21 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
   }, []);
 
-  useEffect(() => {
-    restoreSession().finally(() => setLoading(false));
+  // Idempotent — the actual network call only ever fires once per page load,
+  // no matter how many callers (the provider's own mount effect, the guard,
+  // a client-side navigation into /admin without a full reload) ask for it.
+  const ensureSessionChecked = useCallback((): Promise<void> => {
+    if (!checkPromiseRef.current) {
+      checkPromiseRef.current = restoreSession()
+        .then(() => undefined)
+        .finally(() => setLoading(false));
+    }
+    return checkPromiseRef.current;
   }, [restoreSession]);
+
+  useEffect(() => {
+    if (isAdminPath()) ensureSessionChecked();
+  }, [ensureSessionChecked]);
 
   const login = async (email: string, password: string) => {
     const data = await apiFetch<LoginResponse>("/auth/login", {
@@ -86,7 +105,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
 
   return (
-    <AdminAuthContext.Provider value={{ user, loading, login, logout, authFetch }}>
+    <AdminAuthContext.Provider value={{ user, loading, login, logout, authFetch, ensureSessionChecked }}>
       {children}
     </AdminAuthContext.Provider>
   );
@@ -99,10 +118,26 @@ export function useAdminAuth(): AdminAuthContextValue {
 }
 
 export const AdminAuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAdminAuth();
+  const { user, ensureSessionChecked } = useAdminAuth();
   const location = useLocation();
+  // Own "checking" state rather than trusting the provider's `loading` —
+  // that flag may already be settled (false) from an earlier public-page
+  // mount if this guard is reached via client-side navigation rather than
+  // a fresh load, which would otherwise redirect to login before the
+  // (still-pending) session check for this route has actually run.
+  const [checking, setChecking] = useState(true);
 
-  if (loading) return null;
+  useEffect(() => {
+    let cancelled = false;
+    ensureSessionChecked().then(() => {
+      if (!cancelled) setChecking(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [ensureSessionChecked]);
+
+  if (checking) return null;
   if (!user) return <Navigate to="/admin/login" state={{ from: location }} replace />;
   return <>{children}</>;
 };
