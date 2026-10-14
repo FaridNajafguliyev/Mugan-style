@@ -66,10 +66,6 @@
     color: var(--ink);
   }
 
-  &__muted {
-    font-size: 13px !important;
-    color: var(--sand-dim);
-  }
   &__socials {
     display: flex;
     gap: 18px;
@@ -147,30 +143,5 @@
     font-size: 14px;
     color: #463f30;
     line-height: 1.7;
-  }
-}
-
-.ms-contact-map {
-  &__placeholder {
-    height: 360px;
-    background: repeating-linear-gradient(
-      45deg,
-      var(--ink-soft),
-      var(--ink-soft) 12px,
-      var(--ink) 12px,
-      var(--ink) 24px
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    span {
-      background: var(--ink);
-      color: var(--gold-bright);
-      padding: 14px 28px;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border: 1px solid var(--gold);
-    }
   }
 }

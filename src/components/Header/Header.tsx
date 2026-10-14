@@ -100,7 +100,6 @@ const Header: React.FC = () => {
           Заказать консультацию
         </button>
         <div className="ms-header__drawer-foot">
-          <span>Москва · м. Люблино</span>
           <span>+7 926 593 98 80</span>
         </div>
       </div>

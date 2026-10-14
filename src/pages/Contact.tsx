@@ -54,13 +54,6 @@ const Contact: React.FC = () => {
       <section className="container ms-contact-layout">
         <Reveal as="div" className="ms-contact-info">
           <div>
-            <span className="eyebrow">Адрес</span>
-            <p>Москва, м. Люблино</p>
-            <p className="ms-contact-info__muted">
-              Шоурум работает по предварительной записи
-            </p>
-          </div>
-          <div>
             <span className="eyebrow">Телефон</span>
             <a href="tel:+79265939880">МОБ: +7 926 593 98 80</a>
             <a href="tel:+79645939880">МОБ: +7 964 593 98 80</a>
@@ -137,12 +130,6 @@ const Contact: React.FC = () => {
             </form>
           )}
         </Reveal>
-      </section>
-
-      <section className="ms-contact-map">
-        <div className="ms-contact-map__placeholder">
-          <span>Москва, м. Люблино</span>
-        </div>
       </section>
     </div>
   );

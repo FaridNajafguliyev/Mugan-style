@@ -25,12 +25,6 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="ms-footer__col">
-          <h4 className="eyebrow eyebrow--dark">Адрес</h4>
-          <p>Москва, м. Люблино</p>
-          <p>Шоурум — по записи</p>
-        </div>
-
-        <div className="ms-footer__col">
           <h4 className="eyebrow eyebrow--dark">Контакты</h4>
           <a href="tel:+79265939880">МОБ: +7 926 593 98 80</a>
           <a href="tel:+79645939880">МОБ: +7 964 593 98 80</a>
