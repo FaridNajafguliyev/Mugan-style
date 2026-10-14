@@ -53,7 +53,7 @@ const Header: React.FC = () => {
         </nav>
 
         <button className="ms-header__cta" onClick={() => navigate("/contact")}>
-          Связаться
+          Заказать консультацию
         </button>
 
         <button className="ms-header__cart" onClick={openCart} aria-label="Открыть корзину">
