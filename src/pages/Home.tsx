@@ -4,6 +4,8 @@ import Reveal from "../components/Reveal/Reveal";
 import { apiFetch } from "../lib/api";
 import { formatPrice } from "../lib/format";
 import type { Product } from "../lib/types";
+import { useFavorites } from "../context/FavoritesContext";
+import FavoriteButton from "../components/FavoriteButton/FavoriteButton";
 import "./Home.scss";
 
 const testimonials = [
@@ -27,6 +29,7 @@ const testimonials = [
 
 const Home: React.FC = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   useEffect(() => {
     apiFetch<{ products: Product[] }>("/products?limit=3")
@@ -125,6 +128,11 @@ const Home: React.FC = () => {
                     <img src={p.images[0]} alt={p.title} loading="lazy" />
                     <img src={p.images[1] ?? p.images[0]} alt="" className="ms-product-card__hover" loading="lazy" />
                     <span className="ms-product-card__tag">Дублёнка</span>
+                    <FavoriteButton
+                      className="ms-product-card__fav"
+                      active={isFavorite(p.id)}
+                      onToggle={() => toggleFavorite(p.id)}
+                    />
                   </div>
                   <div className="ms-product-card__info">
                     <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>

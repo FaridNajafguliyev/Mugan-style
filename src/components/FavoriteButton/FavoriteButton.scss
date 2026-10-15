@@ -1,0 +1,26 @@
+@use "../../styles/tokens.scss";
+
+.ms-favorite-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(11, 11, 10, 0.78);
+  color: var(--bone);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-silk), color var(--dur-fast) var(--ease-silk), transform var(--dur-fast) var(--ease-silk);
+
+  svg { width: 17px; height: 17px; }
+
+  &:hover {
+    transform: scale(1.08);
+    color: var(--gold-bright);
+  }
+
+  &.is-active {
+    color: var(--gold-bright);
+  }
+}

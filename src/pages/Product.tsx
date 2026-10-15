@@ -5,12 +5,15 @@ import { apiFetch, ApiError } from "../lib/api";
 import { formatPrice } from "../lib/format";
 import type { Product as ProductType } from "../lib/types";
 import { useCart } from "../context/CartContext";
+import { useFavorites } from "../context/FavoritesContext";
+import FavoriteButton from "../components/FavoriteButton/FavoriteButton";
 import "./Product.scss";
 import Lightbox from "../components/Lightbox/Lightbox";
 
 const Product: React.FC = () => {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [product, setProduct] = useState<ProductType | null>(null);
   const [related, setRelated] = useState<ProductType[]>([]);
   const [notFound, setNotFound] = useState(false);
@@ -60,6 +63,11 @@ const Product: React.FC = () => {
           >
             <img src={product.images[active]} alt={product.title} />
             <span className="ms-product-gallery__tag">Дублёнка</span>
+            <FavoriteButton
+              className="ms-product-gallery__fav"
+              active={isFavorite(product.id)}
+              onToggle={() => toggleFavorite(product.id)}
+            />
           </div>
           {product.images.length > 1 && (
             <div className="ms-product-gallery__thumbs">

@@ -66,6 +66,8 @@
     padding: 6px 11px;
   }
 
+  &__fav { position: absolute; top: 12px; right: 12px; z-index: 3; }
+
   &__view {
     position: absolute; bottom: 16px; left: 16px; z-index: 3;
     color: var(--paper);

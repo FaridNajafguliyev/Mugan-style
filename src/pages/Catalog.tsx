@@ -4,10 +4,13 @@ import Reveal from "../components/Reveal/Reveal";
 import { apiFetch } from "../lib/api";
 import { formatPrice } from "../lib/format";
 import type { Product } from "../lib/types";
+import { useFavorites } from "../context/FavoritesContext";
+import FavoriteButton from "../components/FavoriteButton/FavoriteButton";
 import "./Catalog.scss";
 
 const Catalog: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   useEffect(() => {
     apiFetch<{ products: Product[] }>("/products")
@@ -39,6 +42,11 @@ const Catalog: React.FC = () => {
                 <img src={p.images[0]} alt={p.title} loading="lazy" />
                 <img src={p.images[1] ?? p.images[0]} alt="" className="ms-cat-card__hover" loading="lazy" />
                 <span className="ms-cat-card__tag">Дублёнка</span>
+                <FavoriteButton
+                  className="ms-cat-card__fav"
+                  active={isFavorite(p.id)}
+                  onToggle={() => toggleFavorite(p.id)}
+                />
                 <span className="ms-cat-card__view">Подробнее →</span>
               </div>
               <div className="ms-cat-card__info">

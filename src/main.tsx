@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { CartProvider } from "./context/CartContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 import { AdminAuthProvider } from "./context/AdminAuthContext";
 import "./styles/global.scss";
 
@@ -11,7 +12,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <AdminAuthProvider>
         <CartProvider>
-          <App />
+          <FavoritesProvider>
+            <App />
+          </FavoritesProvider>
         </CartProvider>
       </AdminAuthProvider>
     </BrowserRouter>
