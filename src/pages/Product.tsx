@@ -81,6 +81,7 @@ const Product: React.FC = () => {
 
         <Reveal as="div" className="ms-product-info">
           <span className="eyebrow">{product.categoryLabel}</span>
+          <h1>{product.title}</h1>
           <p className="ms-product-info__price">{formatPrice(product.priceKopecks, product.priceFrom)}</p>
           <p className="ms-product-info__desc">{product.description}</p>
 
@@ -147,6 +148,7 @@ const Product: React.FC = () => {
                   <div>
                     <img src={p.images[0]} alt={p.title} />
                   </div>
+                  <h3>{p.title}</h3>
                   <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>
                 </Link>
               </Reveal>
