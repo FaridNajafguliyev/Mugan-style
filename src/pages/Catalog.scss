@@ -25,30 +25,6 @@
   }
 }
 
-.ms-catalog-filters {
-  padding: 42px var(--gutter) 8px;
-
-  &__row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  &__btn {
-    background: transparent;
-    border: 1px solid var(--sand-dim);
-    color: var(--ink);
-    padding: 10px 20px;
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: all var(--dur-fast) var(--ease-silk);
-
-    &:hover { border-color: var(--gold); }
-    &.is-active { background: var(--ink); border-color: var(--ink); color: var(--bone); }
-  }
-}
-
 .ms-catalog-grid {
   padding: 36px var(--gutter) 110px;
   display: grid;
