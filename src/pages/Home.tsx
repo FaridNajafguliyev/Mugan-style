@@ -51,7 +51,7 @@ const Home: React.FC = () => {
             <em>скроенные для зимы</em>
           </h1>
           <p className="ms-hero__sub">
-            Дублёнки, пальто и куртки ручной работы из натуральной овчины и кожи.
+            Дублёнки ручной работы из натуральной овчины и кожи.
             Тепло, которое носят с гордостью.
           </p>
           <div className="ms-hero__actions">
@@ -76,7 +76,7 @@ const Home: React.FC = () => {
       <section className="section ms-philosophy">
         <div className="container ms-philosophy__grid">
           <Reveal as="div" className="ms-philosophy__image">
-            <img src="/images/coat-black-long-0222.jpg" alt="Пальто Yantar Mugan Style" />
+            <img src="/images/coat-black-long-0222.jpg" alt="Дублёнка Yantar Mugan Style" />
             <div className="ms-philosophy__frame" />
           </Reveal>
 
@@ -92,7 +92,7 @@ const Home: React.FC = () => {
               <p>
                 Мы создаём верхнюю одежду из натуральной овчины и кожи для женщин, которые ценят
                 качество вместо показного блеска. Каждая дублёнка проходит ручную обработку швов,
-                подбор меха по плотности ворса и примерку по российским размерам — от 42 до 66.
+                подбор меха по плотности ворса и примерку по российским размерам — от 44 до 64.
               </p>
             </Reveal>
             <Reveal delay={240}>
