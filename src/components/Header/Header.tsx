@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useFavorites } from "../../context/FavoritesContext";
 import "./Header.scss";
 
 const links = [
@@ -13,6 +14,7 @@ const links = [
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const { count, open: openCart } = useCart();
+  const { ids: favoriteIds } = useFavorites();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -55,6 +57,18 @@ const Header: React.FC = () => {
         <button className="ms-header__cta" onClick={() => navigate("/contact")}>
           Заказать консультацию
         </button>
+
+        <NavLink to="/favorites" className="ms-header__cart" aria-label="Избранное">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 20.3s-7.2-4.4-9.6-8.9C.8 7.9 2.1 4.6 5.3 3.7c2-.5 4 .3 5.2 2l1.5 2.1 1.5-2.1c1.2-1.7 3.2-2.5 5.2-2 3.2.9 4.5 4.2 3 7.7-2.4 4.5-9.7 8.9-9.7 8.9z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {favoriteIds.length > 0 && <span className="ms-header__cart-badge">{favoriteIds.length}</span>}
+        </NavLink>
 
         <button className="ms-header__cart" onClick={openCart} aria-label="Открыть корзину">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

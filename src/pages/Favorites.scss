@@ -1,0 +1,30 @@
+@use "../styles/tokens.scss";
+
+.ms-favorites-page { background: var(--paper); min-height: 60vh; }
+
+.ms-favorites-hero {
+  padding: clamp(140px, 18vw, 200px) 0 60px;
+  background: var(--ink);
+  color: var(--bone);
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 6vw, 66px);
+    font-weight: 500;
+    margin-top: 16px;
+    em { font-style: italic; color: var(--gold-bright); }
+  }
+}
+
+.ms-favorites-empty {
+  padding: clamp(60px, 9vw, 110px) var(--gutter) clamp(90px, 11vw, 140px);
+  text-align: center;
+
+  p {
+    font-size: 15px;
+    color: var(--sand-dim);
+    max-width: 420px;
+    margin: 0 auto 28px;
+    line-height: 1.7;
+  }
+}

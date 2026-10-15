@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 // core storefront above, and the entire /admin/* tree is irrelevant to a
 // shopper — splitting it out of the main bundle keeps the public-facing
 // catalog/product pages light.
+const Favorites = lazy(() => import("./pages/Favorites"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderResult = lazy(() => import("./pages/OrderResult"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
@@ -47,6 +48,7 @@ const App: React.FC = () => {
             <Route path="/catalog/:id" element={<Product />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:orderNumber/result" element={<OrderResult />} />
             <Route path="/track-order" element={<TrackOrder />} />
