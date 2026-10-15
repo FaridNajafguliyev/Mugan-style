@@ -62,9 +62,16 @@
   &__bottom {
     display: flex;
     justify-content: space-between;
+    gap: 24px;
     padding: 26px 0 60px;
     font-size: 12px;
     letter-spacing: 0.04em;
     color: var(--sand-dim);
+
+    a {
+      color: var(--sand-dim);
+      transition: color var(--dur-fast) var(--ease-silk);
+      &:hover { color: var(--gold-bright); }
+    }
   }
 }

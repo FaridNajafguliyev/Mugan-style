@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Checkout from "./pages/Checkout";
 import OrderResult from "./pages/OrderResult";
 import TrackOrder from "./pages/TrackOrder";
+import Requisites from "./pages/Requisites";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminOrders from "./pages/admin/Orders";
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order/:orderNumber/result" element={<OrderResult />} />
           <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/requisites" element={<Requisites />} />
         </Route>
 
         <Route path="/admin/login" element={<AdminLogin />} />

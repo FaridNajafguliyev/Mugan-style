@@ -1,0 +1,71 @@
+@use "../styles/tokens.scss";
+
+.ms-requisites-page {
+  background: var(--paper);
+  min-height: 60vh;
+}
+
+.ms-requisites-hero {
+  background: var(--ink);
+  color: var(--bone);
+  padding: clamp(150px, 18vw, 210px) 0 70px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(34px, 5.6vw, 58px);
+    margin-top: 16px;
+    em {
+      font-style: italic;
+      color: var(--gold-bright);
+    }
+  }
+}
+
+.ms-requisites-body {
+  padding: clamp(60px, 9vw, 110px) var(--gutter);
+}
+
+.ms-requisites-card {
+  max-width: 560px;
+  background: var(--paper-dim);
+  padding: clamp(28px, 4vw, 48px);
+
+  dl {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e3dbc9;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  dt {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sand-dim);
+  }
+
+  dd {
+    font-size: 16px;
+    color: var(--ink);
+
+    a {
+      color: var(--gold);
+      text-decoration: underline;
+      transition: color var(--dur-fast);
+      &:hover { color: var(--ink); }
+    }
+  }
+}
