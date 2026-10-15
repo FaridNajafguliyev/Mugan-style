@@ -57,6 +57,7 @@ export async function restockAfterCancel(lines: StockLine[]): Promise<void> {
 export interface InventoryRow {
   id: string;
   productId: string;
+  productSlug: string;
   title: string;
   sku: string;
   stock: number;
@@ -65,10 +66,11 @@ export interface InventoryRow {
 }
 
 export async function listInventory(): Promise<InventoryRow[]> {
-  const rows = await Inventory.find().populate("product", "title").sort({ sku: 1 }).lean();
+  const rows = await Inventory.find().populate("product", "title slug").sort({ sku: 1 }).lean();
   return rows.map((row) => ({
     id: String(row._id),
     productId: String(row.product?._id ?? row.product),
+    productSlug: (row.product as unknown as { slug?: string })?.slug ?? "",
     title: (row.product as unknown as { title?: string })?.title ?? "—",
     sku: row.sku,
     stock: row.stock,
@@ -80,7 +82,7 @@ export async function listInventory(): Promise<InventoryRow[]> {
 export async function setStock(inventoryId: string, stock: number): Promise<InventoryRow> {
   if (stock < 0) throw new AppError("Остаток не может быть отрицательным", 400);
 
-  const row = await Inventory.findById(inventoryId).populate("product", "title");
+  const row = await Inventory.findById(inventoryId).populate("product", "title slug");
   if (!row) throw new AppError("Позиция склада не найдена", 404);
   if (stock < row.reserved) {
     throw new AppError(
@@ -96,6 +98,7 @@ export async function setStock(inventoryId: string, stock: number): Promise<Inve
   return {
     id: String(row._id),
     productId: String((row.product as unknown as { _id: unknown })?._id ?? row.product),
+    productSlug: (row.product as unknown as { slug?: string })?.slug ?? "",
     title: (row.product as unknown as { title?: string })?.title ?? "—",
     sku: row.sku,
     stock: row.stock,

@@ -159,6 +159,7 @@ export interface Delivery {
 export interface InventoryRow {
   id: string;
   productId: string;
+  productSlug: string;
   title: string;
   sku: string;
   stock: number;

@@ -9,6 +9,7 @@ const Inventory: React.FC = () => {
   const [editing, setEditing] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -36,6 +37,21 @@ const Inventory: React.FC = () => {
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Не удалось обновить остаток");
+    }
+  };
+
+  const handleDelete = async (row: InventoryRow) => {
+    if (!row.productSlug) return;
+    if (!window.confirm(`Удалить товар «${row.title}»? Это действие нельзя отменить.`)) return;
+    setError(null);
+    setDeletingId(row.id);
+    try {
+      await authFetch(`/products/${row.productSlug}`, { method: "DELETE" });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Не удалось удалить товар");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -100,12 +116,21 @@ const Inventory: React.FC = () => {
                         </button>
                       </>
                     ) : (
-                      <button
-                        className="btn"
-                        onClick={() => setEditing((prev) => ({ ...prev, [row.id]: String(row.stock) }))}
-                      >
-                        Изменить
-                      </button>
+                      <>
+                        <button
+                          className="btn"
+                          onClick={() => setEditing((prev) => ({ ...prev, [row.id]: String(row.stock) }))}
+                        >
+                          Изменить
+                        </button>{" "}
+                        <button
+                          className="btn"
+                          onClick={() => handleDelete(row)}
+                          disabled={deletingId === row.id}
+                        >
+                          {deletingId === row.id ? "Удаляем…" : "Удалить"}
+                        </button>
+                      </>
                     )}
                   </td>
                 </tr>

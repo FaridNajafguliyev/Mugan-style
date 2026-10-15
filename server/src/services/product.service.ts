@@ -1,6 +1,7 @@
 import { Product } from "../models/Product.js";
 import { Inventory } from "../models/Inventory.js";
 import { Category } from "../models/Category.js";
+import { Order } from "../models/Order.js";
 import { AppError } from "../utils/AppError.js";
 import { slugify } from "../utils/slugify.js";
 
@@ -203,4 +204,21 @@ export async function updateProduct(
 
   await product.save();
   return toAdminDto(product.slug);
+}
+
+export async function deleteProduct(slug: string): Promise<void> {
+  const product = await Product.findOne({ slug });
+  if (!product) throw new AppError("Товар не найден", 404);
+
+  const hasOrders = await Order.exists({ "items.product": product._id });
+  if (hasOrders) {
+    throw new AppError(
+      "Нельзя удалить товар, по которому уже есть заказы — скройте его вместо этого",
+      409,
+      "PRODUCT_HAS_ORDERS",
+    );
+  }
+
+  await Inventory.deleteOne({ product: product._id });
+  await Product.deleteOne({ _id: product._id });
 }

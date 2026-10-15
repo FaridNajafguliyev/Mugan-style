@@ -51,3 +51,8 @@ export const updateProduct = asyncHandler(async (req: Request, res: Response) =>
   const product = await productService.updateProduct(req.params.slug, input);
   res.json({ product });
 });
+
+export const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
+  await productService.deleteProduct(req.params.slug);
+  res.status(204).send();
+});

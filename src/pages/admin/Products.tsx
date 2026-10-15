@@ -30,6 +30,8 @@ const Products: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
@@ -144,6 +146,20 @@ const Products: React.FC = () => {
       body: JSON.stringify({ isActive: !p.isActive }),
     });
     load();
+  };
+
+  const handleDelete = async (p: AdminProduct) => {
+    if (!window.confirm(`Удалить товар «${p.title}»? Это действие нельзя отменить.`)) return;
+    setListError(null);
+    setDeletingId(p.id);
+    try {
+      await authFetch(`/products/${p.id}`, { method: "DELETE" });
+      load();
+    } catch (err) {
+      setListError(err instanceof ApiError ? err.message : "Не удалось удалить товар");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -310,6 +326,8 @@ const Products: React.FC = () => {
         </div>
       )}
 
+      {listError && <p className="ms-admin-login__error">{listError}</p>}
+
       {loading ? (
         <p>Загрузка…</p>
       ) : (
@@ -352,6 +370,13 @@ const Products: React.FC = () => {
                   </button>{" "}
                   <button className="btn" onClick={() => toggleActive(p)}>
                     {p.isActive ? "Скрыть" : "Показать"}
+                  </button>{" "}
+                  <button
+                    className="btn"
+                    onClick={() => handleDelete(p)}
+                    disabled={deletingId === p.id}
+                  >
+                    {deletingId === p.id ? "Удаляем…" : "Удалить"}
                   </button>
                 </td>
               </tr>
