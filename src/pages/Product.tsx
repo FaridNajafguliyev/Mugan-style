@@ -59,9 +59,7 @@ const Product: React.FC = () => {
             style={{ cursor: "zoom-in" }}
           >
             <img src={product.images[active]} alt={product.title} />
-            <span className="ms-product-gallery__tag">
-              {product.categoryLabel}
-            </span>
+            <span className="ms-product-gallery__tag">Дублёнка</span>
           </div>
           {product.images.length > 1 && (
             <div className="ms-product-gallery__thumbs">
@@ -80,7 +78,7 @@ const Product: React.FC = () => {
         </div>
 
         <Reveal as="div" className="ms-product-info">
-          <span className="eyebrow">{product.categoryLabel}</span>
+          <span className="eyebrow">Дублёнка</span>
           <h1>{product.title}</h1>
           <p className="ms-product-info__price">{formatPrice(product.priceKopecks, product.priceFrom)}</p>
           <p className="ms-product-info__desc">{product.description}</p>

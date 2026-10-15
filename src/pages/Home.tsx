@@ -124,7 +124,7 @@ const Home: React.FC = () => {
                   <div className="ms-product-card__image">
                     <img src={p.images[0]} alt={p.title} loading="lazy" />
                     <img src={p.images[1] ?? p.images[0]} alt="" className="ms-product-card__hover" loading="lazy" />
-                    <span className="ms-product-card__tag">{p.categoryLabel}</span>
+                    <span className="ms-product-card__tag">Дублёнка</span>
                   </div>
                   <div className="ms-product-card__info">
                     <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>
