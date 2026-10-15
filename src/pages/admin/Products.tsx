@@ -13,7 +13,7 @@ const emptyForm: ProductFormInput = {
   sizes: "",
   priceKopecks: 0,
   oldPriceKopecks: null,
-  priceFrom: true,
+  priceFrom: false,
   description: "",
   images: [],
 };
