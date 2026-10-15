@@ -26,7 +26,8 @@
 }
 
 .ms-catalog-grid {
-  padding: clamp(60px, 9vw, 110px) var(--gutter) clamp(90px, 11vw, 140px);
+  padding-top: clamp(60px, 9vw, 110px);
+  padding-bottom: clamp(90px, 11vw, 140px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 40px 32px;

@@ -23,10 +23,17 @@ button { font-family: inherit; cursor: pointer; }
 ul { list-style: none; margin: 0; padding: 0; }
 h1, h2, h3, h4, p { margin: 0; }
 
+// Longhand on purpose: pages combine this class with their own class that
+// sets vertical padding/margin (e.g. `className="container ms-foo"`). A
+// shorthand `padding`/`margin` here claims top/bottom too, and since the
+// bundler doesn't guarantee this rule loads before or after page-specific
+// ones, that silently zeroes whichever side wins the cascade tie.
 .container {
   max-width: var(--container);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
 }
 
 .eyebrow {
