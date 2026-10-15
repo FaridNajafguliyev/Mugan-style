@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
 import { apiFetch, ApiError } from "../lib/api";
-import { formatPrice } from "../lib/format";
+import { discountPercent, formatPrice } from "../lib/format";
 import type { Product as ProductType } from "../lib/types";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
@@ -83,14 +83,28 @@ const Product: React.FC = () => {
         <Reveal as="div" className="ms-product-info">
           <span className="eyebrow">Дублёнка</span>
           <div className="ms-product-info__title-row">
-            <h1>{product.title}</h1>
+            <h1>
+              {product.title}
+              {product.color && <> · {product.color}</>}
+            </h1>
             <FavoriteButton
               className="ms-product-info__fav"
               active={isFavorite(product.id)}
               onToggle={() => toggleFavorite(product.id)}
             />
           </div>
-          <p className="ms-product-info__price">{formatPrice(product.priceKopecks, product.priceFrom)}</p>
+          <p className="ms-product-info__price">
+            {formatPrice(product.priceKopecks, product.priceFrom)}
+            {discountPercent(product.priceKopecks, product.oldPriceKopecks) !== null && (
+              <>
+                {" "}
+                <span className="ms-product-info__price-old">{formatPrice(product.oldPriceKopecks!, false)}</span>{" "}
+                <span className="ms-product-info__discount">
+                  -{discountPercent(product.priceKopecks, product.oldPriceKopecks)}%
+                </span>
+              </>
+            )}
+          </p>
           <p className="ms-product-info__desc">{product.description}</p>
 
           <div className="ms-product-info__specs">

@@ -9,8 +9,10 @@ const emptyForm: ProductFormInput = {
   title: "",
   material: "",
   lining: "",
+  color: "",
   sizes: "",
   priceKopecks: 0,
+  oldPriceKopecks: null,
   priceFrom: true,
   description: "",
   images: [],
@@ -27,6 +29,7 @@ const Products: React.FC = () => {
   const [form, setForm] = useState<ProductFormInput>(emptyForm);
   const [initialStock, setInitialStock] = useState(0);
   const [priceRubles, setPriceRubles] = useState("");
+  const [oldPriceRubles, setOldPriceRubles] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +56,7 @@ const Products: React.FC = () => {
     setEditingId(null);
     setForm({ ...emptyForm, categoryKey: categories[0]?.key ?? "" });
     setPriceRubles("");
+    setOldPriceRubles("");
     setInitialStock(1);
     setError(null);
     setFormOpen(true);
@@ -65,13 +69,16 @@ const Products: React.FC = () => {
       title: p.title,
       material: p.material,
       lining: p.lining,
+      color: p.color ?? "",
       sizes: p.sizes,
       priceKopecks: p.priceKopecks,
+      oldPriceKopecks: p.oldPriceKopecks ?? null,
       priceFrom: p.priceFrom,
       description: p.description,
       images: p.images,
     });
     setPriceRubles(String(Math.round(p.priceKopecks / 100)));
+    setOldPriceRubles(p.oldPriceKopecks ? String(Math.round(p.oldPriceKopecks / 100)) : "");
     setError(null);
     setFormOpen(true);
   };
@@ -112,6 +119,14 @@ const Products: React.FC = () => {
       setError("Укажите корректную цену");
       return;
     }
+    let oldPriceKopecks: number | null = null;
+    if (oldPriceRubles.trim() !== "") {
+      oldPriceKopecks = Math.round(Number(oldPriceRubles) * 100);
+      if (Number.isNaN(oldPriceKopecks) || oldPriceKopecks <= priceKopecks) {
+        setError("Старая цена должна быть больше текущей");
+        return;
+      }
+    }
     if (form.images.length === 0) {
       setError("Добавьте хотя бы одно фото");
       return;
@@ -119,7 +134,7 @@ const Products: React.FC = () => {
 
     setSaving(true);
     try {
-      const payload = { ...form, priceKopecks };
+      const payload = { ...form, priceKopecks, oldPriceKopecks };
       if (editingId === null) {
         await authFetch("/products", {
           method: "POST",
@@ -230,6 +245,15 @@ const Products: React.FC = () => {
 
             <div className="ms-product-form__row">
               <label>
+                Цвет
+                <input
+                  type="text"
+                  value={form.color}
+                  onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))}
+                  placeholder="Серый"
+                />
+              </label>
+              <label>
                 Размеры
                 <input
                   type="text"
@@ -239,6 +263,9 @@ const Products: React.FC = () => {
                   placeholder="42–52"
                 />
               </label>
+            </div>
+
+            <div className="ms-product-form__row">
               <label>
                 Цена, ₽
                 <input
@@ -248,6 +275,16 @@ const Products: React.FC = () => {
                   value={priceRubles}
                   onChange={(e) => setPriceRubles(e.target.value)}
                   placeholder="89000"
+                />
+              </label>
+              <label>
+                Старая цена, ₽ (для скидки)
+                <input
+                  type="number"
+                  min={0}
+                  value={oldPriceRubles}
+                  onChange={(e) => setOldPriceRubles(e.target.value)}
+                  placeholder="Необязательно"
                 />
               </label>
             </div>
@@ -336,6 +373,7 @@ const Products: React.FC = () => {
             <tr>
               <th>Фото</th>
               <th>Название</th>
+              <th>Цвет</th>
               <th>Категория</th>
               <th>Цена</th>
               <th>Остаток</th>
@@ -356,8 +394,17 @@ const Products: React.FC = () => {
                   )}
                 </td>
                 <td>{p.title}</td>
+                <td>{p.color || "—"}</td>
                 <td>{p.categoryLabel}</td>
-                <td>{formatPrice(p.priceKopecks, p.priceFrom)}</td>
+                <td>
+                  {formatPrice(p.priceKopecks, p.priceFrom)}
+                  {p.oldPriceKopecks && p.oldPriceKopecks > p.priceKopecks && (
+                    <>
+                      {" "}
+                      <s style={{ color: "var(--sand-dim)" }}>{formatPrice(p.oldPriceKopecks, false)}</s>
+                    </>
+                  )}
+                </td>
                 <td>{p.available}</td>
                 <td>
                   <span className={`ms-admin-badge ${p.isActive ? "ms-admin-badge--delivered" : "ms-admin-badge--cancelled"}`}>

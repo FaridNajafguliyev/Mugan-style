@@ -12,8 +12,10 @@ export interface ProductDto {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -28,8 +30,10 @@ async function toDto(product: {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -48,8 +52,13 @@ async function toDto(product: {
     title: product.title,
     material: product.material,
     lining: product.lining,
+    color: product.color,
     sizes: product.sizes,
     priceKopecks: product.priceKopecks,
+    oldPriceKopecks:
+      product.oldPriceKopecks && product.oldPriceKopecks > product.priceKopecks
+        ? product.oldPriceKopecks
+        : undefined,
     priceFrom: product.priceFrom,
     description: product.description,
     images: product.images,
@@ -84,8 +93,10 @@ export interface AdminProductDto {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -109,8 +120,10 @@ async function toAdminDto(slug: string): Promise<AdminProductDto> {
     title: product.title,
     material: product.material,
     lining: product.lining,
+    color: product.color ?? undefined,
     sizes: product.sizes,
     priceKopecks: product.priceKopecks,
+    oldPriceKopecks: product.oldPriceKopecks ?? undefined,
     priceFrom: product.priceFrom,
     description: product.description,
     images: product.images,
@@ -131,8 +144,10 @@ export interface ProductInput {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number | null;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -161,8 +176,10 @@ export async function createProduct(
     title: input.title,
     material: input.material,
     lining: input.lining,
+    color: input.color || undefined,
     sizes: input.sizes,
     priceKopecks: input.priceKopecks,
+    oldPriceKopecks: input.oldPriceKopecks || undefined,
     priceFrom: input.priceFrom,
     description: input.description,
     images: input.images,
@@ -195,8 +212,10 @@ export async function updateProduct(
   if (input.title !== undefined) product.title = input.title;
   if (input.material !== undefined) product.material = input.material;
   if (input.lining !== undefined) product.lining = input.lining;
+  if (input.color !== undefined) product.color = input.color || undefined;
   if (input.sizes !== undefined) product.sizes = input.sizes;
   if (input.priceKopecks !== undefined) product.priceKopecks = input.priceKopecks;
+  if (input.oldPriceKopecks !== undefined) product.oldPriceKopecks = input.oldPriceKopecks ?? undefined;
   if (input.priceFrom !== undefined) product.priceFrom = input.priceFrom;
   if (input.description !== undefined) product.description = input.description;
   if (input.images !== undefined) product.images = input.images;

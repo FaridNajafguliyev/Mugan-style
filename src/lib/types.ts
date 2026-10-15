@@ -5,8 +5,10 @@ export interface Product {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -25,8 +27,10 @@ export interface AdminProduct {
   title: string;
   material: string;
   lining: string;
+  color?: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks?: number;
   priceFrom: boolean;
   description: string;
   images: string[];
@@ -41,8 +45,10 @@ export interface ProductFormInput {
   title: string;
   material: string;
   lining: string;
+  color: string;
   sizes: string;
   priceKopecks: number;
+  oldPriceKopecks: number | null;
   priceFrom: boolean;
   description: string;
   images: string[];

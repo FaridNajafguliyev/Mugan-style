@@ -91,6 +91,16 @@
     font-weight: 700;
     margin-bottom: 22px;
   }
+  &__price-old {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--sand-dim);
+    text-decoration: line-through;
+  }
+  &__discount {
+    font-size: 15px;
+    color: var(--red-square);
+  }
   &__desc {
     font-size: 15px;
     line-height: 1.8;
