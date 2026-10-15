@@ -30,8 +30,6 @@
     padding: 6px 11px;
   }
 
-  &__fav { position: absolute; top: 12px; right: 12px; z-index: 3; }
-
   &__view {
     position: absolute; bottom: 16px; left: 16px; z-index: 3;
     color: var(--paper);
@@ -43,8 +41,26 @@
 
   &__info {
     padding-top: 16px;
-    h3 { font-family: var(--font-display); font-size: 22px; font-style: italic; }
     p { font-size: 13px; color: var(--sand-dim); margin-top: 4px; }
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
+    h3 { font-family: var(--font-display); font-size: 22px; font-style: italic; color: var(--ink); }
+  }
+
+  &__fav {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: transparent;
+    color: var(--sand-dim);
+
+    &:hover { color: var(--gold); }
+    &.is-active { color: var(--gold); }
   }
 
   &__meta {

@@ -19,15 +19,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: p }) => {
         <img src={p.images[0]} alt={p.title} loading="lazy" />
         <img src={p.images[1] ?? p.images[0]} alt="" className="ms-cat-card__hover" loading="lazy" />
         <span className="ms-cat-card__tag">Дублёнка</span>
-        <FavoriteButton
-          className="ms-cat-card__fav"
-          active={isFavorite(p.id)}
-          onToggle={() => toggleFavorite(p.id)}
-        />
         <span className="ms-cat-card__view">Подробнее →</span>
       </div>
       <div className="ms-cat-card__info">
-        <h3>{p.title}</h3>
+        <div className="ms-cat-card__title-row">
+          <h3>{p.title}</h3>
+          <FavoriteButton
+            className="ms-cat-card__fav"
+            active={isFavorite(p.id)}
+            onToggle={() => toggleFavorite(p.id)}
+          />
+        </div>
         <div className="ms-cat-card__meta">
           <span>Размеры {p.sizes}</span>
           <span className="ms-cat-card__price">{formatPrice(p.priceKopecks, p.priceFrom)}</span>

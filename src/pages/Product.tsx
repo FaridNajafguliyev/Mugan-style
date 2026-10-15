@@ -63,11 +63,6 @@ const Product: React.FC = () => {
           >
             <img src={product.images[active]} alt={product.title} />
             <span className="ms-product-gallery__tag">Дублёнка</span>
-            <FavoriteButton
-              className="ms-product-gallery__fav"
-              active={isFavorite(product.id)}
-              onToggle={() => toggleFavorite(product.id)}
-            />
           </div>
           {product.images.length > 1 && (
             <div className="ms-product-gallery__thumbs">
@@ -87,7 +82,14 @@ const Product: React.FC = () => {
 
         <Reveal as="div" className="ms-product-info">
           <span className="eyebrow">Дублёнка</span>
-          <h1>{product.title}</h1>
+          <div className="ms-product-info__title-row">
+            <h1>{product.title}</h1>
+            <FavoriteButton
+              className="ms-product-info__fav"
+              active={isFavorite(product.id)}
+              onToggle={() => toggleFavorite(product.id)}
+            />
+          </div>
           <p className="ms-product-info__price">{formatPrice(product.priceKopecks, product.priceFrom)}</p>
           <p className="ms-product-info__desc">{product.description}</p>
 

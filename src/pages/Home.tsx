@@ -128,14 +128,14 @@ const Home: React.FC = () => {
                     <img src={p.images[0]} alt={p.title} loading="lazy" />
                     <img src={p.images[1] ?? p.images[0]} alt="" className="ms-product-card__hover" loading="lazy" />
                     <span className="ms-product-card__tag">Дублёнка</span>
+                  </div>
+                  <div className="ms-product-card__info">
+                    <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>
                     <FavoriteButton
                       className="ms-product-card__fav"
                       active={isFavorite(p.id)}
                       onToggle={() => toggleFavorite(p.id)}
                     />
-                  </div>
-                  <div className="ms-product-card__info">
-                    <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>
                   </div>
                 </Link>
               </Reveal>
