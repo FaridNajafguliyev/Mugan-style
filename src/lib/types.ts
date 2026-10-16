@@ -178,6 +178,7 @@ export interface InventoryProductGroup {
   productId: string;
   productSlug: string;
   title: string;
+  color?: string;
   sku: string;
   sizes: InventorySizeRow[];
 }

@@ -185,10 +185,12 @@ export async function createProduct(input: ProductInput): Promise<AdminProductDt
   });
 
   // No stock yet — sizes and their quantities are added afterwards on the
-  // Склад (Inventory) page, one size at a time.
+  // Склад (Inventory) page, one size at a time. SKU tracks the title (not
+  // the immutable slug) so it stays meaningful if the title is renamed —
+  // see the sync in updateProduct below.
   await Inventory.create({
     product: product._id,
-    sku: slug.toUpperCase(),
+    sku: input.title,
     sizes: [],
   });
 
@@ -208,7 +210,11 @@ export async function updateProduct(
     product.category = category._id;
     product.categoryLabel = category.label;
   }
-  if (input.title !== undefined) product.title = input.title;
+  if (input.title !== undefined && input.title !== product.title) {
+    product.title = input.title;
+    // Артикул tracks the title automatically — no separate admin edit for it.
+    await Inventory.updateOne({ product: product._id }, { $set: { sku: input.title } });
+  }
   if (input.material !== undefined) product.material = input.material;
   if (input.lining !== undefined) product.lining = input.lining;
   if (input.color !== undefined) product.color = input.color || undefined;

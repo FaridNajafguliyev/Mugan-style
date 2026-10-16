@@ -8,7 +8,6 @@ const Inventory: React.FC = () => {
   const [groups, setGroups] = useState<InventoryProductGroup[]>([]);
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Record<string, string>>({});
-  const [editingSku, setEditingSku] = useState<Record<string, string>>({});
   const [addingFor, setAddingFor] = useState<string | null>(null);
   const [newSize, setNewSize] = useState("");
   const [newStock, setNewStock] = useState("0");
@@ -55,29 +54,6 @@ const Inventory: React.FC = () => {
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Не удалось обновить остаток");
-    } finally {
-      setBusyKey(null);
-    }
-  };
-
-  const handleSaveSku = async (productId: string) => {
-    const sku = (editingSku[productId] ?? "").trim();
-    if (!sku) return;
-    setError(null);
-    setBusyKey(productId);
-    try {
-      await authFetch(`/inventory/${productId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ sku }),
-      });
-      setEditingSku((prev) => {
-        const next = { ...prev };
-        delete next[productId];
-        return next;
-      });
-      load();
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Не удалось обновить артикул");
     } finally {
       setBusyKey(null);
     }
@@ -144,47 +120,10 @@ const Inventory: React.FC = () => {
             <div className="ms-inventory-group" key={g.productId}>
               <div className="ms-inventory-group__head">
                 <h3>{g.title}</h3>
-                {g.productId in editingSku ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editingSku[g.productId]}
-                      onChange={(e) =>
-                        setEditingSku((prev) => ({ ...prev, [g.productId]: e.target.value }))
-                      }
-                      style={{ width: 160 }}
-                    />
-                    <button
-                      className="btn"
-                      onClick={() => handleSaveSku(g.productId)}
-                      disabled={busyKey === g.productId}
-                    >
-                      Сохранить
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() =>
-                        setEditingSku((prev) => {
-                          const next = { ...prev };
-                          delete next[g.productId];
-                          return next;
-                        })
-                      }
-                    >
-                      Отмена
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span>{g.sku}</span>
-                    <button
-                      className="btn"
-                      onClick={() => setEditingSku((prev) => ({ ...prev, [g.productId]: g.sku }))}
-                    >
-                      Изменить артикул
-                    </button>
-                  </>
-                )}
+                <span>
+                  {g.sku}
+                  {g.color ? `/${g.color}` : ""}
+                </span>
               </div>
 
               <table className="ms-admin-table">

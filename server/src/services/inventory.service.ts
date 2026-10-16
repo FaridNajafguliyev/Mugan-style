@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Inventory } from "../models/Inventory.js";
+import { Inventory, type InventoryDoc } from "../models/Inventory.js";
 import { AppError } from "../utils/AppError.js";
 
 export interface StockLine {
@@ -89,26 +89,33 @@ export interface InventoryProductGroup {
   productId: string;
   productSlug: string;
   title: string;
+  color?: string;
   sku: string;
   sizes: InventorySizeRow[];
 }
 
-export async function listInventory(): Promise<InventoryProductGroup[]> {
-  const rows = await Inventory.find().populate("product", "title slug").sort({ sku: 1 }).lean();
-  return rows.map((row) => ({
-    productId: String(row.product?._id ?? row.product),
-    productSlug: (row.product as unknown as { slug?: string })?.slug ?? "",
-    title: (row.product as unknown as { title?: string })?.title ?? "—",
-    sku: row.sku,
-    sizes: row.sizes
-      .map((s) => ({
-        size: s.size,
-        stock: s.stock,
-        reserved: s.reserved,
-        available: s.stock - s.reserved,
-      }))
+type PopulatedInventory = InventoryDoc & {
+  _id: unknown;
+  product: { _id: unknown; title?: string; slug?: string; color?: string } | unknown;
+};
+
+function toGroup(inv: PopulatedInventory): InventoryProductGroup {
+  const product = inv.product as { _id?: unknown; title?: string; slug?: string; color?: string };
+  return {
+    productId: String(product?._id ?? inv.product),
+    productSlug: product?.slug ?? "",
+    title: product?.title ?? "—",
+    color: product?.color ?? undefined,
+    sku: inv.sku,
+    sizes: inv.sizes
+      .map((s) => ({ size: s.size, stock: s.stock, reserved: s.reserved, available: s.stock - s.reserved }))
       .sort((a, b) => a.size.localeCompare(b.size, "ru", { numeric: true })),
-  }));
+  };
+}
+
+export async function listInventory(): Promise<InventoryProductGroup[]> {
+  const rows = await Inventory.find().populate("product", "title slug color").sort({ sku: 1 }).lean();
+  return rows.map((row) => toGroup(row as never));
 }
 
 export async function setSizeStock(
@@ -118,7 +125,7 @@ export async function setSizeStock(
 ): Promise<InventoryProductGroup> {
   if (stock < 0) throw new AppError("Остаток не может быть отрицательным", 400);
 
-  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug");
+  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug color");
   if (!inv) throw new AppError("Позиция склада не найдена", 404);
 
   const row = inv.sizes.find((s) => s.size === size);
@@ -134,39 +141,7 @@ export async function setSizeStock(
   row.stock = stock;
   await inv.save();
 
-  return {
-    productId: String((inv.product as unknown as { _id: unknown })?._id ?? inv.product),
-    productSlug: (inv.product as unknown as { slug?: string })?.slug ?? "",
-    title: (inv.product as unknown as { title?: string })?.title ?? "—",
-    sku: inv.sku,
-    sizes: inv.sizes
-      .map((s) => ({ size: s.size, stock: s.stock, reserved: s.reserved, available: s.stock - s.reserved }))
-      .sort((a, b) => a.size.localeCompare(b.size, "ru", { numeric: true })),
-  };
-}
-
-export async function updateSku(productId: string, sku: string): Promise<InventoryProductGroup> {
-  const trimmedSku = sku.trim();
-  if (!trimmedSku) throw new AppError("Укажите артикул", 400);
-
-  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug");
-  if (!inv) throw new AppError("Позиция склада не найдена", 404);
-
-  const taken = await Inventory.exists({ sku: trimmedSku, _id: { $ne: inv._id } });
-  if (taken) throw new AppError("Такой артикул уже используется", 409);
-
-  inv.sku = trimmedSku;
-  await inv.save();
-
-  return {
-    productId: String((inv.product as unknown as { _id: unknown })?._id ?? inv.product),
-    productSlug: (inv.product as unknown as { slug?: string })?.slug ?? "",
-    title: (inv.product as unknown as { title?: string })?.title ?? "—",
-    sku: inv.sku,
-    sizes: inv.sizes
-      .map((s) => ({ size: s.size, stock: s.stock, reserved: s.reserved, available: s.stock - s.reserved }))
-      .sort((a, b) => a.size.localeCompare(b.size, "ru", { numeric: true })),
-  };
+  return toGroup(inv as never);
 }
 
 export async function addSizeRow(
@@ -178,7 +153,7 @@ export async function addSizeRow(
   const trimmedSize = size.trim();
   if (!trimmedSize) throw new AppError("Укажите размер", 400);
 
-  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug");
+  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug color");
   if (!inv) throw new AppError("Позиция склада не найдена", 404);
 
   if (inv.sizes.some((s) => s.size === trimmedSize)) {
@@ -188,15 +163,7 @@ export async function addSizeRow(
   inv.sizes.push({ size: trimmedSize, stock, reserved: 0 });
   await inv.save();
 
-  return {
-    productId: String((inv.product as unknown as { _id: unknown })?._id ?? inv.product),
-    productSlug: (inv.product as unknown as { slug?: string })?.slug ?? "",
-    title: (inv.product as unknown as { title?: string })?.title ?? "—",
-    sku: inv.sku,
-    sizes: inv.sizes
-      .map((s) => ({ size: s.size, stock: s.stock, reserved: s.reserved, available: s.stock - s.reserved }))
-      .sort((a, b) => a.size.localeCompare(b.size, "ru", { numeric: true })),
-  };
+  return toGroup(inv as never);
 }
 
 export async function removeSizeRow(productId: string, size: string): Promise<void> {
