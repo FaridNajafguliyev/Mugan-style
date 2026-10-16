@@ -34,9 +34,7 @@ const productInputSchema = z.object({
   images: z.array(z.string()).min(1),
 });
 
-const createProductSchema = productInputSchema.extend({
-  initialStock: z.number().int().min(0),
-});
+const createProductSchema = productInputSchema;
 
 const updateProductSchema = productInputSchema.partial().extend({
   isActive: z.boolean().optional(),

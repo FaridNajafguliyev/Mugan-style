@@ -14,7 +14,7 @@ export interface Actor {
 }
 
 export interface CreateOrderInput {
-  items: { productId: string; qty: number }[];
+  items: { productId: string; size: string; qty: number }[];
   contactName: string;
   contactPhone: string;
   customerEmail?: string;
@@ -45,6 +45,7 @@ export async function createOrder(input: CreateOrderInput) {
 
   const stockLines = input.items.map((i) => ({
     productId: productBySlug.get(i.productId)!._id,
+    size: i.size,
     qty: i.qty,
   }));
   await inventoryService.reserveStock(stockLines);
@@ -56,6 +57,7 @@ export async function createOrder(input: CreateOrderInput) {
         product: product._id,
         titleSnapshot: product.title,
         priceKopecksSnapshot: product.priceKopecks,
+        size: i.size,
         qty: i.qty,
         imageSnapshot: product.images[0],
       };
@@ -117,7 +119,7 @@ export async function changeStatus(
     throw new AppError(`Недопустимый переход статуса: ${fromStatus} → ${toStatus}`, 409, "INVALID_TRANSITION");
   }
 
-  const stockLines = order.items.map((i) => ({ productId: i.product, qty: i.qty }));
+  const stockLines = order.items.map((i) => ({ productId: i.product, size: i.size, qty: i.qty }));
 
   if (toStatus === "CANCELLED") {
     if (fromStatus === "PENDING_PAYMENT") {

@@ -29,7 +29,7 @@ const Checkout: React.FC = () => {
       const data = await apiFetch<CreateOrderResponse>("/orders", {
         method: "POST",
         body: JSON.stringify({
-          items: items.map((i) => ({ productId: i.id, qty: i.qty })),
+          items: items.map((i) => ({ productId: i.id, size: i.size, qty: i.qty })),
           contactName: String(form.get("name") ?? ""),
           contactPhone: String(form.get("phone") ?? ""),
           deliveryAddress: {
@@ -79,12 +79,12 @@ const Checkout: React.FC = () => {
               <h3>Ваш заказ</h3>
               <div className="ms-checkout-summary__list">
                 {items.map((item) => (
-                  <div key={item.id} className="ms-checkout-summary__item">
+                  <div key={`${item.id}-${item.size}`} className="ms-checkout-summary__item">
                     <img src={item.image} alt={item.title} />
                     <div>
                       <span className="ms-checkout-summary__title">{item.title}</span>
                       <span className="ms-checkout-summary__meta">
-                        {item.qty} × {formatPrice(item.priceKopecks, false)}
+                        Размер {item.size} · {item.qty} × {formatPrice(item.priceKopecks, false)}
                       </span>
                     </div>
                     <span className="ms-checkout-summary__line-total">

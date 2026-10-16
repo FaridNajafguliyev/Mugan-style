@@ -19,11 +19,15 @@ const Product: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState(false);
 
   useEffect(() => {
     setActive(0);
     setProduct(null);
     setNotFound(false);
+    setSelectedSize(null);
+    setSizeError(false);
     window.scrollTo({ top: 0 });
 
     if (!id) return;
@@ -47,6 +51,26 @@ const Product: React.FC = () => {
 
   if (notFound) return <Navigate to="/catalog" replace />;
   if (!product) return null;
+
+  const selectedSizeStock = product.sizeStock.find((s) => s.size === selectedSize);
+  const canAdd = !!selectedSizeStock && selectedSizeStock.available > 0;
+
+  const handleAddToCart = () => {
+    if (!canAdd || !selectedSizeStock) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
+    addItem({
+      id: product.id,
+      title: product.title,
+      priceKopecks: product.priceKopecks,
+      priceFrom: product.priceFrom,
+      image: product.images[0],
+      size: selectedSizeStock.size,
+      available: selectedSizeStock.available,
+    });
+  };
 
   return (
     <div className="ms-product-page">
@@ -122,20 +146,36 @@ const Product: React.FC = () => {
             </div>
           </div>
 
+          {product.sizeStock.length > 0 && (
+            <div className="ms-product-info__sizes">
+              <span className="ms-product-info__sizes-label">
+                Размер{selectedSize ? `: ${selectedSize}` : ""}
+              </span>
+              <div className="ms-product-info__sizes-row">
+                {product.sizeStock.map((s) => (
+                  <button
+                    key={s.size}
+                    type="button"
+                    className={`ms-product-info__size-btn ${selectedSize === s.size ? "is-active" : ""}`}
+                    disabled={s.available <= 0}
+                    onClick={() => {
+                      setSelectedSize(s.size);
+                      setSizeError(false);
+                    }}
+                  >
+                    {s.size}
+                  </button>
+                ))}
+              </div>
+              {sizeError && <p className="ms-product-info__size-error">Выберите размер</p>}
+            </div>
+          )}
+
           <div className="ms-product-info__actions">
             <button
               className="btn btn--gold"
               disabled={product.available <= 0}
-              onClick={() =>
-                addItem({
-                  id: product.id,
-                  title: product.title,
-                  priceKopecks: product.priceKopecks,
-                  priceFrom: product.priceFrom,
-                  image: product.images[0],
-                  available: product.available,
-                })
-              }
+              onClick={handleAddToCart}
             >
               {product.available > 0 ? "Добавить в корзину" : "Нет в наличии"}
             </button>

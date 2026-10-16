@@ -6,6 +6,16 @@ import { categoriesSeed } from "../seed/categories.seed.js";
 import { productsSeed } from "../seed/products.seed.js";
 import mongoose from "mongoose";
 
+function parseSizeRange(sizesText: string): string[] {
+  const match = sizesText.match(/(\d+)\s*[–-]\s*(\d+)/);
+  if (!match) return [];
+  const start = Number(match[1]);
+  const end = Number(match[2]);
+  const sizes: string[] = [];
+  for (let s = start; s <= end; s += 2) sizes.push(String(s));
+  return sizes;
+}
+
 async function run() {
   await connectDb();
 
@@ -46,14 +56,19 @@ async function run() {
       { upsert: true, new: true },
     );
 
+    const discreteSizes = parseSizeRange(p.sizes);
+    const seededSizes =
+      discreteSizes.length > 0
+        ? discreteSizes.map((size, i) => ({ size, stock: i === 0 ? p.stock : 0, reserved: 0 }))
+        : [{ size: p.sizes, stock: p.stock, reserved: 0 }];
+
     await Inventory.findOneAndUpdate(
       { product: product._id },
       {
         $setOnInsert: {
           product: product._id,
           sku: p.slug.toUpperCase(),
-          stock: p.stock,
-          reserved: 0,
+          sizes: seededSizes,
         },
       },
       { upsert: true },

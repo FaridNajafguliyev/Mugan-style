@@ -1,3 +1,8 @@
+export interface SizeAvailability {
+  size: string;
+  available: number;
+}
+
 export interface Product {
   id: string;
   category: string;
@@ -7,6 +12,7 @@ export interface Product {
   lining: string;
   color?: string;
   sizes: string;
+  sizeStock: SizeAvailability[];
   priceKopecks: number;
   oldPriceKopecks?: number;
   priceFrom: boolean;
@@ -35,8 +41,6 @@ export interface AdminProduct {
   description: string;
   images: string[];
   isActive: boolean;
-  stock: number;
-  reserved: number;
   available: number;
 }
 
@@ -102,6 +106,7 @@ export interface OrderItemLine {
   product: string;
   titleSnapshot: string;
   priceKopecksSnapshot: number;
+  size: string;
   qty: number;
   imageSnapshot?: string;
 }
@@ -162,15 +167,19 @@ export interface Delivery {
   deliveredAt?: string;
 }
 
-export interface InventoryRow {
-  id: string;
+export interface InventorySizeRow {
+  size: string;
+  stock: number;
+  reserved: number;
+  available: number;
+}
+
+export interface InventoryProductGroup {
   productId: string;
   productSlug: string;
   title: string;
   sku: string;
-  stock: number;
-  reserved: number;
-  available: number;
+  sizes: InventorySizeRow[];
 }
 
 export interface AdminCustomerRow {

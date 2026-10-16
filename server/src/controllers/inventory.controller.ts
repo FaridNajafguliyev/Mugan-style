@@ -3,15 +3,27 @@ import { z } from "zod";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import * as inventoryService from "../services/inventory.service.js";
 
-const setStockSchema = z.object({ stock: z.number().int().min(0) });
+const setSizeStockSchema = z.object({ stock: z.number().int().min(0) });
+const addSizeSchema = z.object({ size: z.string().min(1), stock: z.number().int().min(0).default(0) });
 
 export const listInventory = asyncHandler(async (_req: Request, res: Response) => {
   const inventory = await inventoryService.listInventory();
   res.json({ inventory });
 });
 
-export const setStock = asyncHandler(async (req: Request, res: Response) => {
-  const { stock } = setStockSchema.parse(req.body);
-  const row = await inventoryService.setStock(req.params.id, stock);
+export const setSizeStock = asyncHandler(async (req: Request, res: Response) => {
+  const { stock } = setSizeStockSchema.parse(req.body);
+  const row = await inventoryService.setSizeStock(req.params.productId, req.params.size, stock);
   res.json({ inventory: row });
+});
+
+export const addSize = asyncHandler(async (req: Request, res: Response) => {
+  const { size, stock } = addSizeSchema.parse(req.body);
+  const row = await inventoryService.addSizeRow(req.params.productId, size, stock);
+  res.status(201).json({ inventory: row });
+});
+
+export const removeSize = asyncHandler(async (req: Request, res: Response) => {
+  await inventoryService.removeSizeRow(req.params.productId, req.params.size);
+  res.status(204).send();
 });

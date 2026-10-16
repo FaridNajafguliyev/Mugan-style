@@ -115,7 +115,7 @@ const OrderDetail: React.FC = () => {
               {order.items.map((item, i) => (
                 <div key={i} className="ms-admin-detail__item">
                   <span>
-                    {item.titleSnapshot} × {item.qty}
+                    {item.titleSnapshot} · р. {item.size} × {item.qty}
                   </span>
                   <span>{formatPrice(item.priceKopecksSnapshot * item.qty, false)}</span>
                 </div>

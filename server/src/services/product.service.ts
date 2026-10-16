@@ -4,6 +4,8 @@ import { Category } from "../models/Category.js";
 import { Order } from "../models/Order.js";
 import { AppError } from "../utils/AppError.js";
 import { slugify } from "../utils/slugify.js";
+import * as inventoryService from "./inventory.service.js";
+import type { SizeAvailability } from "./inventory.service.js";
 
 export interface ProductDto {
   id: string;
@@ -14,6 +16,7 @@ export interface ProductDto {
   lining: string;
   color?: string;
   sizes: string;
+  sizeStock: SizeAvailability[];
   priceKopecks: number;
   oldPriceKopecks?: number;
   priceFrom: boolean;
@@ -38,8 +41,8 @@ async function toDto(product: {
   description: string;
   images: string[];
 }): Promise<ProductDto> {
-  const inventory = await Inventory.findOne({ product: product._id }).lean();
-  const available = inventory ? inventory.stock - inventory.reserved : 0;
+  const sizeStock = await inventoryService.getSizeAvailability(product._id as never);
+  const available = sizeStock.reduce((sum, s) => sum + s.available, 0);
   const categoryKey =
     typeof product.category === "object" && product.category && "key" in product.category
       ? (product.category as { key: string }).key
@@ -54,6 +57,7 @@ async function toDto(product: {
     lining: product.lining,
     color: product.color,
     sizes: product.sizes,
+    sizeStock,
     priceKopecks: product.priceKopecks,
     oldPriceKopecks:
       product.oldPriceKopecks && product.oldPriceKopecks > product.priceKopecks
@@ -101,8 +105,6 @@ export interface AdminProductDto {
   description: string;
   images: string[];
   isActive: boolean;
-  stock: number;
-  reserved: number;
   available: number;
 }
 
@@ -110,7 +112,7 @@ async function toAdminDto(slug: string): Promise<AdminProductDto> {
   const product = await Product.findOne({ slug }).populate("category", "key").lean();
   if (!product) throw new AppError("Товар не найден", 404);
 
-  const inventory = await Inventory.findOne({ product: product._id }).lean();
+  const available = await inventoryService.getTotalAvailable(product._id as never);
   const categoryKey = (product.category as unknown as { key?: string })?.key ?? String(product.category);
 
   return {
@@ -128,9 +130,7 @@ async function toAdminDto(slug: string): Promise<AdminProductDto> {
     description: product.description,
     images: product.images,
     isActive: product.isActive,
-    stock: inventory?.stock ?? 0,
-    reserved: inventory?.reserved ?? 0,
-    available: inventory ? inventory.stock - inventory.reserved : 0,
+    available,
   };
 }
 
@@ -153,9 +153,7 @@ export interface ProductInput {
   images: string[];
 }
 
-export async function createProduct(
-  input: ProductInput & { initialStock: number },
-): Promise<AdminProductDto> {
+export async function createProduct(input: ProductInput): Promise<AdminProductDto> {
   const category = await Category.findOne({ key: input.categoryKey });
   if (!category) throw new AppError("Категория не найдена", 400);
 
@@ -186,11 +184,12 @@ export async function createProduct(
     isActive: true,
   });
 
+  // No stock yet — sizes and their quantities are added afterwards on the
+  // Склад (Inventory) page, one size at a time.
   await Inventory.create({
     product: product._id,
     sku: slug.toUpperCase(),
-    stock: input.initialStock,
-    reserved: 0,
+    sizes: [],
   });
 
   return toAdminDto(slug);

@@ -1,143 +1,250 @@
 import React, { useEffect, useState } from "react";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 import { ApiError } from "../../lib/api";
-import type { InventoryRow } from "../../lib/types";
+import type { InventoryProductGroup } from "../../lib/types";
 
 const Inventory: React.FC = () => {
   const { authFetch } = useAdminAuth();
-  const [rows, setRows] = useState<InventoryRow[]>([]);
+  const [groups, setGroups] = useState<InventoryProductGroup[]>([]);
+  const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Record<string, string>>({});
+  const [addingFor, setAddingFor] = useState<string | null>(null);
+  const [newSize, setNewSize] = useState("");
+  const [newStock, setNewStock] = useState("0");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
-    authFetch<{ inventory: InventoryRow[] }>("/inventory")
-      .then((data) => setRows(data.inventory))
+    authFetch<{ inventory: InventoryProductGroup[] }>("/inventory")
+      .then((data) => setGroups(data.inventory))
       .finally(() => setLoading(false));
   };
 
   useEffect(load, [authFetch]);
 
-  const handleSave = async (id: string) => {
-    const value = Number(editing[id]);
+  const key = (productId: string, size: string) => `${productId}:${size}`;
+
+  const filteredGroups = groups.filter((g) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return g.title.toLowerCase().includes(q) || g.sku.toLowerCase().includes(q);
+  });
+
+  const handleSaveSize = async (productId: string, size: string) => {
+    const k = key(productId, size);
+    const value = Number(editing[k]);
     if (Number.isNaN(value) || value < 0) return;
     setError(null);
+    setBusyKey(k);
     try {
-      await authFetch(`/inventory/${id}`, {
+      await authFetch(`/inventory/${productId}/sizes/${encodeURIComponent(size)}`, {
         method: "PATCH",
         body: JSON.stringify({ stock: value }),
       });
       setEditing((prev) => {
         const next = { ...prev };
-        delete next[id];
+        delete next[k];
         return next;
       });
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Не удалось обновить остаток");
+    } finally {
+      setBusyKey(null);
     }
   };
 
-  const handleDelete = async (row: InventoryRow) => {
-    if (!row.productSlug) return;
-    if (!window.confirm(`Удалить товар «${row.title}»? Это действие нельзя отменить.`)) return;
+  const handleAddSize = async (productId: string) => {
+    const size = newSize.trim();
+    const stock = Number(newStock);
+    if (!size || Number.isNaN(stock) || stock < 0) return;
     setError(null);
-    setDeletingId(row.id);
+    setBusyKey(productId);
     try {
-      await authFetch(`/products/${row.productSlug}`, { method: "DELETE" });
+      await authFetch(`/inventory/${productId}/sizes`, {
+        method: "POST",
+        body: JSON.stringify({ size, stock }),
+      });
+      setAddingFor(null);
+      setNewSize("");
+      setNewStock("0");
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Не удалось удалить товар");
+      setError(err instanceof ApiError ? err.message : "Не удалось добавить размер");
     } finally {
-      setDeletingId(null);
+      setBusyKey(null);
+    }
+  };
+
+  const handleRemoveSize = async (productId: string, size: string) => {
+    if (!window.confirm(`Удалить размер ${size}?`)) return;
+    const k = key(productId, size);
+    setError(null);
+    setBusyKey(k);
+    try {
+      await authFetch(`/inventory/${productId}/sizes/${encodeURIComponent(size)}`, { method: "DELETE" });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Не удалось удалить размер");
+    } finally {
+      setBusyKey(null);
     }
   };
 
   return (
     <div className="ms-admin-page">
       <h1 className="ms-admin-page__title">Склад</h1>
+
+      <input
+        type="text"
+        className="ms-inventory-search"
+        placeholder="Поиск по модели или артикулу…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       {error && <p className="ms-admin-login__error">{error}</p>}
 
       {loading ? (
         <p>Загрузка…</p>
+      ) : filteredGroups.length === 0 ? (
+        <p>Ничего не найдено.</p>
       ) : (
-        <table className="ms-admin-table">
-          <thead>
-            <tr>
-              <th>Товар</th>
-              <th>SKU</th>
-              <th>Остаток</th>
-              <th>Резерв</th>
-              <th>Доступно</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const isEditing = row.id in editing;
-              return (
-                <tr key={row.id} style={{ cursor: "default" }}>
-                  <td>{row.title}</td>
-                  <td>{row.sku}</td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        min={0}
-                        value={editing[row.id]}
-                        onChange={(e) => setEditing((prev) => ({ ...prev, [row.id]: e.target.value }))}
-                        style={{ width: 70 }}
-                      />
-                    ) : (
-                      row.stock
-                    )}
-                  </td>
-                  <td>{row.reserved}</td>
-                  <td>{row.available}</td>
-                  <td>
-                    {isEditing ? (
-                      <>
-                        <button className="btn" onClick={() => handleSave(row.id)}>
-                          Сохранить
-                        </button>{" "}
-                        <button
-                          className="btn"
-                          onClick={() =>
-                            setEditing((prev) => {
-                              const next = { ...prev };
-                              delete next[row.id];
-                              return next;
-                            })
-                          }
-                        >
-                          Отмена
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          className="btn"
-                          onClick={() => setEditing((prev) => ({ ...prev, [row.id]: String(row.stock) }))}
-                        >
-                          Изменить
-                        </button>{" "}
-                        <button
-                          className="btn"
-                          onClick={() => handleDelete(row)}
-                          disabled={deletingId === row.id}
-                        >
-                          {deletingId === row.id ? "Удаляем…" : "Удалить"}
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="ms-inventory-groups">
+          {filteredGroups.map((g) => (
+            <div className="ms-inventory-group" key={g.productId}>
+              <div className="ms-inventory-group__head">
+                <h3>{g.title}</h3>
+                <span>{g.sku}</span>
+              </div>
+
+              <table className="ms-admin-table">
+                <thead>
+                  <tr>
+                    <th>Размер</th>
+                    <th>Остаток</th>
+                    <th>Резерв</th>
+                    <th>Доступно</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {g.sizes.map((row) => {
+                    const k = key(g.productId, row.size);
+                    const isEditing = k in editing;
+                    return (
+                      <tr key={row.size} style={{ cursor: "default" }}>
+                        <td>{row.size}</td>
+                        <td>
+                          {isEditing ? (
+                            <input
+                              type="number"
+                              min={0}
+                              value={editing[k]}
+                              onChange={(e) => setEditing((prev) => ({ ...prev, [k]: e.target.value }))}
+                              style={{ width: 70 }}
+                            />
+                          ) : (
+                            row.stock
+                          )}
+                        </td>
+                        <td>{row.reserved}</td>
+                        <td>{row.available}</td>
+                        <td>
+                          {isEditing ? (
+                            <>
+                              <button
+                                className="btn"
+                                onClick={() => handleSaveSize(g.productId, row.size)}
+                                disabled={busyKey === k}
+                              >
+                                Сохранить
+                              </button>{" "}
+                              <button
+                                className="btn"
+                                onClick={() =>
+                                  setEditing((prev) => {
+                                    const next = { ...prev };
+                                    delete next[k];
+                                    return next;
+                                  })
+                                }
+                              >
+                                Отмена
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                className="btn"
+                                onClick={() => setEditing((prev) => ({ ...prev, [k]: String(row.stock) }))}
+                              >
+                                Изменить
+                              </button>{" "}
+                              <button
+                                className="btn"
+                                onClick={() => handleRemoveSize(g.productId, row.size)}
+                                disabled={busyKey === k || row.reserved > 0}
+                              >
+                                Удалить
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {addingFor === g.productId ? (
+                <div className="ms-inventory-group__add">
+                  <input
+                    type="text"
+                    placeholder="Размер, напр. 46"
+                    value={newSize}
+                    onChange={(e) => setNewSize(e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Остаток"
+                    value={newStock}
+                    onChange={(e) => setNewStock(e.target.value)}
+                    style={{ width: 90 }}
+                  />
+                  <button
+                    className="btn btn--gold"
+                    onClick={() => handleAddSize(g.productId)}
+                    disabled={busyKey === g.productId}
+                  >
+                    Добавить
+                  </button>
+                  <button
+                    className="btn"
+                    onClick={() => {
+                      setAddingFor(null);
+                      setNewSize("");
+                      setNewStock("0");
+                    }}
+                  >
+                    Отмена
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="btn"
+                  style={{ marginTop: 14 }}
+                  onClick={() => setAddingFor(g.productId)}
+                >
+                  + Добавить размер
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

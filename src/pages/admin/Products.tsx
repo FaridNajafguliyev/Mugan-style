@@ -27,7 +27,6 @@ const Products: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null); // null = create mode, "" = form closed
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState<ProductFormInput>(emptyForm);
-  const [initialStock, setInitialStock] = useState(0);
   const [priceRubles, setPriceRubles] = useState("");
   const [oldPriceRubles, setOldPriceRubles] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -57,7 +56,6 @@ const Products: React.FC = () => {
     setForm({ ...emptyForm, categoryKey: categories[0]?.key ?? "" });
     setPriceRubles("");
     setOldPriceRubles("");
-    setInitialStock(1);
     setError(null);
     setFormOpen(true);
   };
@@ -138,7 +136,7 @@ const Products: React.FC = () => {
       if (editingId === null) {
         await authFetch("/products", {
           method: "POST",
-          body: JSON.stringify({ ...payload, initialStock }),
+          body: JSON.stringify(payload),
         });
       } else {
         await authFetch(`/products/${editingId}`, {
@@ -298,18 +296,13 @@ const Products: React.FC = () => {
                 />
                 Показывать «от» перед ценой
               </label>
-              {editingId === null && (
-                <label>
-                  Начальный остаток
-                  <input
-                    type="number"
-                    min={0}
-                    value={initialStock}
-                    onChange={(e) => setInitialStock(Number(e.target.value))}
-                  />
-                </label>
-              )}
             </div>
+
+            {editingId === null && (
+              <p className="ms-product-form__note">
+                Остатки по размерам добавляются после сохранения — на странице «Склад».
+              </p>
+            )}
 
             <label>
               Описание

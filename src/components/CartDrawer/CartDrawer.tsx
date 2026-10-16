@@ -23,16 +23,17 @@ const CartDrawer: React.FC = () => {
           <>
             <div className="ms-cart-drawer__list">
               {items.map((item) => (
-                <div key={item.id} className="ms-cart-drawer__item">
+                <div key={`${item.id}-${item.size}`} className="ms-cart-drawer__item">
                   <img src={item.image} alt={item.title} />
                   <div className="ms-cart-drawer__item-info">
                     <span className="ms-cart-drawer__item-title">{item.title}</span>
+                    <span className="ms-cart-drawer__item-meta">Размер {item.size}</span>
                     <span className="ms-cart-drawer__item-price">
                       {formatPrice(item.priceKopecks, false)}
                     </span>
                     <div className="ms-cart-drawer__item-qty">
                       <button
-                        onClick={() => adjustQty(item.id, -1)}
+                        onClick={() => adjustQty(item.id, item.size, -1)}
                         disabled={item.qty <= 1}
                         aria-label="Уменьшить количество"
                       >
@@ -40,7 +41,7 @@ const CartDrawer: React.FC = () => {
                       </button>
                       <span>{item.qty}</span>
                       <button
-                        onClick={() => adjustQty(item.id, 1)}
+                        onClick={() => adjustQty(item.id, item.size, 1)}
                         disabled={item.qty >= item.available}
                         aria-label="Увеличить количество"
                       >
@@ -50,7 +51,7 @@ const CartDrawer: React.FC = () => {
                   </div>
                   <button
                     className="ms-cart-drawer__item-remove"
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(item.id, item.size)}
                     aria-label="Удалить товар"
                   >
                     ✕

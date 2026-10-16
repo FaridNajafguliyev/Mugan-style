@@ -10,7 +10,7 @@ interface TrackedOrder {
   orderNumber: string;
   status: OrderStatus;
   totalKopecks: number;
-  items: { title: string; qty: number; image?: string }[];
+  items: { title: string; size: string; qty: number; image?: string }[];
   createdAt: string;
 }
 
@@ -88,7 +88,7 @@ const TrackOrder: React.FC = () => {
             <div className="ms-track-result__items">
               {order.items.map((item, i) => (
                 <span key={i}>
-                  {item.title} × {item.qty}
+                  {item.title} · р. {item.size} × {item.qty}
                 </span>
               ))}
             </div>

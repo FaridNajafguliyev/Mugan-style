@@ -6,6 +6,7 @@ export interface CartItem {
   priceKopecks: number;
   priceFrom: boolean;
   image: string;
+  size: string;
   qty: number;
   available: number;
 }
@@ -13,9 +14,9 @@ export interface CartItem {
 interface CartContextValue {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "qty">, qty?: number) => void;
-  removeItem: (id: string) => void;
-  updateQty: (id: string, qty: number) => void;
-  adjustQty: (id: string, delta: number) => void;
+  removeItem: (id: string, size: string) => void;
+  updateQty: (id: string, size: string, qty: number) => void;
+  adjustQty: (id: string, size: string, delta: number) => void;
   clear: () => void;
   count: number;
   subtotalKopecks: number;
@@ -47,30 +48,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addItem: CartContextValue["addItem"] = (item, qty = 1) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const existing = prev.find((i) => i.id === item.id && i.size === item.size);
       if (existing) {
         const nextQty = Math.min(existing.qty + qty, Math.max(item.available, existing.qty));
-        return prev.map((i) => (i.id === item.id ? { ...i, qty: nextQty } : i));
+        return prev.map((i) =>
+          i.id === item.id && i.size === item.size ? { ...i, qty: nextQty } : i,
+        );
       }
       return [...prev, { ...item, qty: Math.max(1, Math.min(qty, item.available || qty)) }];
     });
     setIsOpen(true);
   };
 
-  const removeItem = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+  const removeItem = (id: string, size: string) =>
+    setItems((prev) => prev.filter((i) => !(i.id === id && i.size === size)));
 
-  const updateQty = (id: string, qty: number) =>
+  const updateQty = (id: string, size: string, qty: number) =>
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, Math.min(qty, i.available)) } : i)),
+      prev.map((i) =>
+        i.id === id && i.size === size ? { ...i, qty: Math.max(1, Math.min(qty, i.available)) } : i,
+      ),
     );
 
   // Computes the next quantity from the current state inside the updater,
   // not from a value closed over at render time — so clicking +/- rapidly
   // (faster than a re-render) still compounds correctly instead of
   // collapsing every pending click onto the same next value.
-  const adjustQty = (id: string, delta: number) =>
+  const adjustQty = (id: string, size: string, delta: number) =>
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, Math.min(i.qty + delta, i.available)) } : i)),
+      prev.map((i) =>
+        i.id === id && i.size === size
+          ? { ...i, qty: Math.max(1, Math.min(i.qty + delta, i.available)) }
+          : i,
+      ),
     );
 
   const clear = () => setItems([]);

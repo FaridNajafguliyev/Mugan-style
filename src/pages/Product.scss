@@ -119,6 +119,48 @@
     span { color: var(--sand-dim); }
     strong { font-weight: 600; }
   }
+  &__sizes {
+    margin-bottom: 24px;
+  }
+  &__sizes-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sand-dim);
+    margin-bottom: 10px;
+  }
+  &__sizes-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  &__size-btn {
+    min-width: 46px;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #d9d0bd;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-silk);
+
+    &:hover:not(:disabled) { border-color: var(--gold); }
+    &.is-active { background: var(--ink); border-color: var(--ink); color: var(--bone); }
+    &:disabled {
+      color: var(--sand-dim);
+      text-decoration: line-through;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+  &__size-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--red-square);
+  }
+
   &__actions {
     display: flex;
     gap: 14px;

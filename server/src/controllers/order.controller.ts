@@ -7,7 +7,7 @@ import { ORDER_STATUSES } from "../types/order.js";
 
 const createOrderSchema = z.object({
   items: z
-    .array(z.object({ productId: z.string().min(1), qty: z.number().int().min(1) }))
+    .array(z.object({ productId: z.string().min(1), size: z.string().min(1), qty: z.number().int().min(1) }))
     .min(1),
   contactName: z.string().min(1),
   contactPhone: z.string().min(5),
@@ -93,7 +93,7 @@ export const trackOrder = asyncHandler(async (req: Request, res: Response) => {
       orderNumber: order.orderNumber,
       status: order.status,
       totalKopecks: order.totalKopecks,
-      items: order.items.map((i) => ({ title: i.titleSnapshot, qty: i.qty, image: i.imageSnapshot })),
+      items: order.items.map((i) => ({ title: i.titleSnapshot, size: i.size, qty: i.qty, image: i.imageSnapshot })),
       createdAt: order.createdAt,
     },
     history: history.map((h) => ({ toStatus: h.toStatus, createdAt: h.createdAt })),
