@@ -119,11 +119,10 @@ const Inventory: React.FC = () => {
           {filteredGroups.map((g) => (
             <div className="ms-inventory-group" key={g.productId}>
               <div className="ms-inventory-group__head">
-                <h3>{g.title}</h3>
-                <span>
+                <h3>
                   {g.sku}
                   {g.color ? `/${g.color}` : ""}
-                </span>
+                </h3>
               </div>
 
               <table className="ms-admin-table">
