@@ -146,6 +146,23 @@ export async function changeStatus(
   return order;
 }
 
+export async function deleteOrder(orderId: string) {
+  const order = await Order.findById(orderId);
+  if (!order) throw new AppError("Заказ не найден", 404);
+
+  // Only terminal orders — CANCELLED/RETURNED already released or restocked
+  // their reserved units, so there's nothing left to unwind here.
+  if (order.status !== "CANCELLED" && order.status !== "RETURNED") {
+    throw new AppError(
+      "Можно удалить только отменённый или возвращённый заказ — сначала измените статус",
+      409,
+    );
+  }
+
+  await OrderStatusHistory.deleteMany({ order: order._id });
+  await Order.deleteOne({ _id: order._id });
+}
+
 export async function getOrderById(orderId: string) {
   const order = await Order.findById(orderId).populate("customer").populate("delivery");
   if (!order) throw new AppError("Заказ не найден", 404);

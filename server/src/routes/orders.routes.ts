@@ -6,6 +6,7 @@ import {
   getOrder,
   getOrderHistory,
   changeOrderStatus,
+  deleteOrder,
   trackOrder,
 } from "../controllers/order.controller.js";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.js";
@@ -29,5 +30,6 @@ router.get("/", listOrders);
 router.get("/:id", getOrder);
 router.get("/:id/history", getOrderHistory);
 router.patch("/:id/status", changeOrderStatus);
+router.delete("/:id", requireRole("admin"), deleteOrder);
 
 export default router;

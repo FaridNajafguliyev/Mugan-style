@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 import { formatPrice, formatDate } from "../../lib/format";
 import { ApiError } from "../../lib/api";
@@ -17,12 +17,15 @@ import {
 const OrderDetail: React.FC = () => {
   const { id } = useParams();
   const { authFetch } = useAdminAuth();
+  const navigate = useNavigate();
   const [order, setOrder] = useState<AdminOrder | null>(null);
   const [history, setHistory] = useState<OrderHistoryEntry[]>([]);
   const [nextStatus, setNextStatus] = useState<OrderStatus | "">("");
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [company, setCompany] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -70,6 +73,20 @@ const OrderDetail: React.FC = () => {
       setError(err instanceof ApiError ? err.message : "Не удалось изменить статус");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+    if (!window.confirm(`Удалить заказ ${order?.orderNumber}? Это действие нельзя отменить.`)) return;
+    setDeleteError(null);
+    setDeleting(true);
+    try {
+      await authFetch(`/orders/${id}`, { method: "DELETE" });
+      navigate("/admin/orders");
+    } catch (err) {
+      setDeleteError(err instanceof ApiError ? err.message : "Не удалось удалить заказ");
+      setDeleting(false);
     }
   };
 
@@ -197,6 +214,17 @@ const OrderDetail: React.FC = () => {
             )}
             {error && <p className="ms-admin-login__error">{error}</p>}
           </div>
+
+          {(order.status === "CANCELLED" || order.status === "RETURNED") && (
+            <div className="ms-admin-detail__card">
+              <h3>Удаление</h3>
+              <p>Заказ отменён/возвращён — его можно безвозвратно удалить (например, тестовый заказ).</p>
+              <button className="btn" onClick={handleDelete} disabled={deleting}>
+                Удалить заказ
+              </button>
+              {deleteError && <p className="ms-admin-login__error">{deleteError}</p>}
+            </div>
+          )}
 
           <div className="ms-admin-detail__card">
             <h3>Доставка</h3>

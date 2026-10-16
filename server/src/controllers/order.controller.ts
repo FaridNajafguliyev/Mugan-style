@@ -100,6 +100,11 @@ export const trackOrder = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const deleteOrder = asyncHandler(async (req: Request, res: Response) => {
+  await orderService.deleteOrder(req.params.id);
+  res.status(204).send();
+});
+
 export const getOrderByNumberPublic = asyncHandler(async (req: Request, res: Response) => {
   const order = await orderService.getOrderByNumber(req.params.orderNumber);
   res.json({ orderNumber: order.orderNumber, status: order.status, totalKopecks: order.totalKopecks });
