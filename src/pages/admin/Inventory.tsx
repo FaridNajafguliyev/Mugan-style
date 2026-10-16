@@ -32,16 +32,19 @@ const Inventory: React.FC = () => {
     return g.title.toLowerCase().includes(q) || g.sku.toLowerCase().includes(q);
   });
 
-  const handleSaveSize = async (productId: string, size: string) => {
+  const handleSaveSize = async (productId: string, size: string, reserved: number) => {
     const k = key(productId, size);
-    const value = Number(editing[k]);
-    if (Number.isNaN(value) || value < 0) return;
+    const availableValue = Number(editing[k]);
+    if (Number.isNaN(availableValue) || availableValue < 0) return;
     setError(null);
     setBusyKey(k);
     try {
+      // The admin only ever sees/sets "available to sell" — reserved (units
+      // tied up in a pending order) stays invisible bookkeeping, so the
+      // actual stored stock has it added back in here.
       await authFetch(`/inventory/${productId}/sizes/${encodeURIComponent(size)}`, {
         method: "PATCH",
-        body: JSON.stringify({ stock: value }),
+        body: JSON.stringify({ stock: availableValue + reserved }),
       });
       setEditing((prev) => {
         const next = { ...prev };
@@ -124,8 +127,6 @@ const Inventory: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Размер</th>
-                    <th>Остаток</th>
-                    <th>Резерв</th>
                     <th>Доступно</th>
                     <th></th>
                   </tr>
@@ -147,17 +148,15 @@ const Inventory: React.FC = () => {
                               style={{ width: 70 }}
                             />
                           ) : (
-                            row.stock
+                            row.available
                           )}
                         </td>
-                        <td>{row.reserved}</td>
-                        <td>{row.available}</td>
                         <td>
                           {isEditing ? (
                             <>
                               <button
                                 className="btn"
-                                onClick={() => handleSaveSize(g.productId, row.size)}
+                                onClick={() => handleSaveSize(g.productId, row.size, row.reserved)}
                                 disabled={busyKey === k}
                               >
                                 Сохранить
@@ -179,7 +178,7 @@ const Inventory: React.FC = () => {
                             <>
                               <button
                                 className="btn"
-                                onClick={() => setEditing((prev) => ({ ...prev, [k]: String(row.stock) }))}
+                                onClick={() => setEditing((prev) => ({ ...prev, [k]: String(row.available) }))}
                               >
                                 Изменить
                               </button>{" "}
@@ -210,7 +209,7 @@ const Inventory: React.FC = () => {
                   <input
                     type="number"
                     min={0}
-                    placeholder="Остаток"
+                    placeholder="Доступно"
                     value={newStock}
                     onChange={(e) => setNewStock(e.target.value)}
                     style={{ width: 90 }}
