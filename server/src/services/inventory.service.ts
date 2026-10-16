@@ -145,6 +145,30 @@ export async function setSizeStock(
   };
 }
 
+export async function updateSku(productId: string, sku: string): Promise<InventoryProductGroup> {
+  const trimmedSku = sku.trim();
+  if (!trimmedSku) throw new AppError("Укажите артикул", 400);
+
+  const inv = await Inventory.findOne({ product: productId }).populate("product", "title slug");
+  if (!inv) throw new AppError("Позиция склада не найдена", 404);
+
+  const taken = await Inventory.exists({ sku: trimmedSku, _id: { $ne: inv._id } });
+  if (taken) throw new AppError("Такой артикул уже используется", 409);
+
+  inv.sku = trimmedSku;
+  await inv.save();
+
+  return {
+    productId: String((inv.product as unknown as { _id: unknown })?._id ?? inv.product),
+    productSlug: (inv.product as unknown as { slug?: string })?.slug ?? "",
+    title: (inv.product as unknown as { title?: string })?.title ?? "—",
+    sku: inv.sku,
+    sizes: inv.sizes
+      .map((s) => ({ size: s.size, stock: s.stock, reserved: s.reserved, available: s.stock - s.reserved }))
+      .sort((a, b) => a.size.localeCompare(b.size, "ru", { numeric: true })),
+  };
+}
+
 export async function addSizeRow(
   productId: string,
   size: string,

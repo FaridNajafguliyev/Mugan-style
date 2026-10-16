@@ -490,9 +490,19 @@
 .ms-inventory-group {
   &__head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 14px;
+
+    input {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1px solid #d9d0bd;
+      padding: 7px 10px;
+    }
 
     h3 {
       font-family: var(--font-display);
