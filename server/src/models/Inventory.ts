@@ -12,7 +12,9 @@ const sizeStockSchema = new Schema(
 const inventorySchema = new Schema(
   {
     product: { type: Schema.Types.ObjectId, ref: "Product", required: true, unique: true },
-    sku: { type: String, required: true, unique: true },
+    // Not unique: different colour variants of the same model legitimately
+    // share one артикул (e.g. "D-126/90K" in both black and grey).
+    sku: { type: String, required: true },
     sizes: { type: [sizeStockSchema], required: true, default: [] },
   },
   { timestamps: true },
