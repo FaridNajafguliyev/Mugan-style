@@ -34,6 +34,7 @@ const Products: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [listError, setListError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [duplicateSourceTitle, setDuplicateSourceTitle] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
@@ -53,6 +54,7 @@ const Products: React.FC = () => {
 
   const openCreateForm = () => {
     setEditingId(null);
+    setDuplicateSourceTitle(null);
     setForm({ ...emptyForm, categoryKey: categories[0]?.key ?? "" });
     setPriceRubles("");
     setOldPriceRubles("");
@@ -62,6 +64,7 @@ const Products: React.FC = () => {
 
   const openEditForm = (p: AdminProduct) => {
     setEditingId(p.id);
+    setDuplicateSourceTitle(null);
     setForm({
       categoryKey: p.categoryKey,
       title: p.title,
@@ -74,6 +77,32 @@ const Products: React.FC = () => {
       priceFrom: p.priceFrom,
       description: p.description,
       images: p.images,
+    });
+    setPriceRubles(String(Math.round(p.priceKopecks / 100)));
+    setOldPriceRubles(p.oldPriceKopecks ? String(Math.round(p.oldPriceKopecks / 100)) : "");
+    setError(null);
+    setFormOpen(true);
+  };
+
+  // Most fields (material, подкладка, размеры, описание) repeat across
+  // models almost verbatim — only name/color/price/photos usually differ.
+  // Duplicating pre-fills everything except photos (always new) so the
+  // admin only has to adjust what's actually different.
+  const openDuplicateForm = (p: AdminProduct) => {
+    setEditingId(null);
+    setDuplicateSourceTitle(p.title);
+    setForm({
+      categoryKey: p.categoryKey,
+      title: p.title,
+      material: p.material,
+      lining: p.lining,
+      color: p.color ?? "",
+      sizes: p.sizes,
+      priceKopecks: p.priceKopecks,
+      oldPriceKopecks: p.oldPriceKopecks ?? null,
+      priceFrom: p.priceFrom,
+      description: p.description,
+      images: [],
     });
     setPriceRubles(String(Math.round(p.priceKopecks / 100)));
     setOldPriceRubles(p.oldPriceKopecks ? String(Math.round(p.oldPriceKopecks / 100)) : "");
@@ -186,7 +215,13 @@ const Products: React.FC = () => {
 
       {formOpen && (
         <div className="ms-admin-detail__card" style={{ marginBottom: 28 }}>
-          <h3>{editingId === null ? "Новый товар" : `Редактировать: ${form.title}`}</h3>
+          <h3>
+            {editingId !== null
+              ? `Редактировать: ${form.title}`
+              : duplicateSourceTitle
+                ? `Новый товар (на основе «${duplicateSourceTitle}»)`
+                : "Новый товар"}
+          </h3>
           <form className="ms-product-form" onSubmit={handleSubmit}>
             <div className="ms-product-form__row">
               <label>
@@ -407,6 +442,9 @@ const Products: React.FC = () => {
                 <td>
                   <button className="btn" onClick={() => openEditForm(p)}>
                     Изменить
+                  </button>{" "}
+                  <button className="btn" onClick={() => openDuplicateForm(p)}>
+                    Дублировать
                   </button>{" "}
                   <button className="btn" onClick={() => toggleActive(p)}>
                     {p.isActive ? "Скрыть" : "Показать"}
