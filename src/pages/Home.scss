@@ -21,20 +21,6 @@
       transform: scale(1.08);
       animation: ms-hero-zoom 18s var(--ease-silk) forwards;
     }
-
-    // Framed smaller within the section (dark background showing at the
-    // edges) rather than full-bleed cropping in tight on the model — only
-    // once there's enough height for the letterboxed photo and the text
-    // below it to both breathe; on short/narrow (mobile) viewports this
-    // shrinks the visible photo so much the text ends up overlapping it.
-    @media (min-width: 700px) and (min-height: 700px) {
-      inset: clamp(28px, 7vh, 72px) clamp(20px, 9vw, 130px);
-      img {
-        object-fit: contain;
-        object-position: center;
-        transform: scale(1.04);
-      }
-    }
   }
 
   &__scrim {
