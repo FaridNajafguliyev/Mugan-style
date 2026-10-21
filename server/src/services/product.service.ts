@@ -25,23 +25,25 @@ export interface ProductDto {
   available: number;
 }
 
-async function toDto(product: {
-  _id: unknown;
-  slug: string;
-  category: { key: string } | unknown;
-  categoryLabel: string;
-  title: string;
-  material: string;
-  lining: string;
-  color?: string;
-  sizes: string;
-  priceKopecks: number;
-  oldPriceKopecks?: number;
-  priceFrom: boolean;
-  description: string;
-  images: string[];
-}): Promise<ProductDto> {
-  const sizeStock = await inventoryService.getSizeAvailability(product._id as never);
+function toDto(
+  product: {
+    _id: unknown;
+    slug: string;
+    category: { key: string } | unknown;
+    categoryLabel: string;
+    title: string;
+    material: string;
+    lining: string;
+    color?: string;
+    sizes: string;
+    priceKopecks: number;
+    oldPriceKopecks?: number;
+    priceFrom: boolean;
+    description: string;
+    images: string[];
+  },
+  sizeStock: SizeAvailability[],
+): ProductDto {
   const available = sizeStock.reduce((sum, s) => sum + s.available, 0);
   const categoryKey =
     typeof product.category === "object" && product.category && "key" in product.category
@@ -81,13 +83,15 @@ export async function listProducts(params: { category?: string; limit?: number }
 
   const limited = params.limit ? filtered.slice(0, params.limit) : filtered;
 
-  return Promise.all(limited.map((p) => toDto(p as never)));
+  const stockByProduct = await inventoryService.getSizeAvailabilityMany(limited.map((p) => p._id));
+  return limited.map((p) => toDto(p as never, stockByProduct.get(String(p._id)) ?? []));
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDto> {
   const product = await Product.findOne({ slug, isActive: true }).populate("category", "key").lean();
   if (!product) throw new AppError("Product not found", 404);
-  return toDto(product as never);
+  const sizeStock = await inventoryService.getSizeAvailability(product._id as never);
+  return toDto(product as never, sizeStock);
 }
 
 export interface AdminProductDto {
@@ -108,11 +112,25 @@ export interface AdminProductDto {
   available: number;
 }
 
-async function toAdminDto(slug: string): Promise<AdminProductDto> {
-  const product = await Product.findOne({ slug }).populate("category", "key").lean();
-  if (!product) throw new AppError("Товар не найден", 404);
-
-  const available = await inventoryService.getTotalAvailable(product._id as never);
+function toAdminDtoFromProduct(
+  product: {
+    slug: string;
+    category: { key: string } | unknown;
+    categoryLabel: string;
+    title: string;
+    material: string;
+    lining: string;
+    color?: string;
+    sizes: string;
+    priceKopecks: number;
+    oldPriceKopecks?: number;
+    priceFrom: boolean;
+    description: string;
+    images: string[];
+    isActive: boolean;
+  },
+  available: number,
+): AdminProductDto {
   const categoryKey = (product.category as unknown as { key?: string })?.key ?? String(product.category);
 
   return {
@@ -134,9 +152,22 @@ async function toAdminDto(slug: string): Promise<AdminProductDto> {
   };
 }
 
+async function toAdminDto(slug: string): Promise<AdminProductDto> {
+  const product = await Product.findOne({ slug }).populate("category", "key").lean();
+  if (!product) throw new AppError("Товар не найден", 404);
+
+  const available = await inventoryService.getTotalAvailable(product._id as never);
+  return toAdminDtoFromProduct(product as never, available);
+}
+
 export async function listProductsAdmin(): Promise<AdminProductDto[]> {
-  const products = await Product.find().sort({ createdAt: -1 }).lean();
-  return Promise.all(products.map((p) => toAdminDto(p.slug)));
+  const products = await Product.find().populate("category", "key").sort({ createdAt: -1 }).lean();
+  const stockByProduct = await inventoryService.getSizeAvailabilityMany(products.map((p) => p._id));
+
+  return products.map((p) => {
+    const available = (stockByProduct.get(String(p._id)) ?? []).reduce((sum, s) => sum + s.available, 0);
+    return toAdminDtoFromProduct(p as never, available);
+  });
 }
 
 export interface ProductInput {

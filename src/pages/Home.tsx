@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
 import { apiFetch } from "../lib/api";
-import { formatPrice } from "../lib/format";
+import { cloudinaryResize, formatPrice } from "../lib/format";
 import type { Product } from "../lib/types";
 import { useFavorites } from "../context/FavoritesContext";
 import FavoriteButton from "../components/FavoriteButton/FavoriteButton";
@@ -125,8 +125,13 @@ const Home: React.FC = () => {
               <Reveal key={p.id} delay={i * 100} className="ms-product-card">
                 <Link to={`/catalog/${p.id}`}>
                   <div className="ms-product-card__image">
-                    <img src={p.images[0]} alt={p.title} loading="lazy" />
-                    <img src={p.images[1] ?? p.images[0]} alt="" className="ms-product-card__hover" loading="lazy" />
+                    <img src={cloudinaryResize(p.images[0], 600)} alt={p.title} loading="lazy" />
+                    <img
+                      src={cloudinaryResize(p.images[1] ?? p.images[0], 600)}
+                      alt=""
+                      className="ms-product-card__hover"
+                      loading="lazy"
+                    />
                     <span className="ms-product-card__tag">Дублёнка</span>
                   </div>
                   <div className="ms-product-card__info">

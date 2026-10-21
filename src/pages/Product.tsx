@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
 import { apiFetch, ApiError } from "../lib/api";
-import { discountPercent, formatPrice } from "../lib/format";
+import { cloudinaryResize, discountPercent, formatPrice } from "../lib/format";
 import type { Product as ProductType } from "../lib/types";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
@@ -85,7 +85,7 @@ const Product: React.FC = () => {
             onClick={() => setLightbox(true)}
             style={{ cursor: "zoom-in" }}
           >
-            <img src={product.images[active]} alt={product.title} />
+            <img src={cloudinaryResize(product.images[active], 1200)} alt={product.title} />
             <span className="ms-product-gallery__tag">Дублёнка</span>
           </div>
           {product.images.length > 1 && (
@@ -97,7 +97,7 @@ const Product: React.FC = () => {
                   onClick={() => setActive(i)}
                   aria-label={`Фото ${i + 1}`}
                 >
-                  <img src={img} alt="" />
+                  <img src={cloudinaryResize(img, 160)} alt="" />
                 </button>
               ))}
             </div>
@@ -208,7 +208,7 @@ const Product: React.FC = () => {
               >
                 <Link to={`/catalog/${p.id}`}>
                   <div>
-                    <img src={p.images[0]} alt={p.title} />
+                    <img src={cloudinaryResize(p.images[0], 600)} alt={p.title} />
                   </div>
                   <h3>{p.title}</h3>
                   <span>{formatPrice(p.priceKopecks, p.priceFrom)}</span>

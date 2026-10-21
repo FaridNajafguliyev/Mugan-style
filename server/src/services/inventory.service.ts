@@ -78,6 +78,25 @@ export async function getTotalAvailable(productId: Types.ObjectId | string): Pro
   return inv.sizes.reduce((sum, s) => sum + Math.max(0, s.stock - s.reserved), 0);
 }
 
+/**
+ * Batched form of getSizeAvailability — one query for every product in the
+ * list instead of one query per product (the catalog/admin list calls this
+ * per product it renders, so that pattern gets slower as the catalog grows).
+ */
+export async function getSizeAvailabilityMany(
+  productIds: (Types.ObjectId | string)[],
+): Promise<Map<string, SizeAvailability[]>> {
+  const rows = await Inventory.find({ product: { $in: productIds } }).lean();
+  const map = new Map<string, SizeAvailability[]>();
+  for (const inv of rows) {
+    map.set(
+      String(inv.product),
+      inv.sizes.map((s) => ({ size: s.size, available: Math.max(0, s.stock - s.reserved) })),
+    );
+  }
+  return map;
+}
+
 export interface InventorySizeRow {
   size: string;
   stock: number;

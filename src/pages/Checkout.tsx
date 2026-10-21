@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import Reveal from "../components/Reveal/Reveal";
 import { useCart } from "../context/CartContext";
 import { apiFetch, ApiError } from "../lib/api";
-import { formatPrice } from "../lib/format";
+import { cloudinaryResize, formatPrice } from "../lib/format";
 import "./Checkout.scss";
 
 interface CreateOrderResponse {
@@ -80,7 +80,7 @@ const Checkout: React.FC = () => {
               <div className="ms-checkout-summary__list">
                 {items.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="ms-checkout-summary__item">
-                    <img src={item.image} alt={item.title} />
+                    <img src={cloudinaryResize(item.image, 160)} alt={item.title} />
                     <div>
                       <span className="ms-checkout-summary__title">{item.title}</span>
                       <span className="ms-checkout-summary__meta">

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
-import { formatPrice } from "../../lib/format";
+import { cloudinaryResize, formatPrice } from "../../lib/format";
 import "./CartDrawer.scss";
 
 const CartDrawer: React.FC = () => {
@@ -24,7 +24,7 @@ const CartDrawer: React.FC = () => {
             <div className="ms-cart-drawer__list">
               {items.map((item) => (
                 <div key={`${item.id}-${item.size}`} className="ms-cart-drawer__item">
-                  <img src={item.image} alt={item.title} />
+                  <img src={cloudinaryResize(item.image, 160)} alt={item.title} />
                   <div className="ms-cart-drawer__item-info">
                     <span className="ms-cart-drawer__item-title">{item.title}</span>
                     <span className="ms-cart-drawer__item-meta">Размер {item.size}</span>

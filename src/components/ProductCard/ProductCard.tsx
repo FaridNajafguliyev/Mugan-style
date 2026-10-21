@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { discountPercent, formatPrice } from "../../lib/format";
+import { cloudinaryResize, discountPercent, formatPrice } from "../../lib/format";
 import type { Product } from "../../lib/types";
 import { useFavorites } from "../../context/FavoritesContext";
 import FavoriteButton from "../FavoriteButton/FavoriteButton";
@@ -17,8 +17,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product: p }) => {
   return (
     <Link to={`/catalog/${p.id}`} className="ms-cat-card">
       <div className="ms-cat-card__image">
-        <img src={p.images[0]} alt={p.title} loading="lazy" />
-        <img src={p.images[1] ?? p.images[0]} alt="" className="ms-cat-card__hover" loading="lazy" />
+        <img src={cloudinaryResize(p.images[0], 600)} alt={p.title} loading="lazy" />
+        <img
+          src={cloudinaryResize(p.images[1] ?? p.images[0], 600)}
+          alt=""
+          className="ms-cat-card__hover"
+          loading="lazy"
+        />
         <span className="ms-cat-card__tag">Дублёнка</span>
         <span className="ms-cat-card__view">Подробнее →</span>
       </div>

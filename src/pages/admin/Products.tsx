@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAdminAuth } from "../../context/AdminAuthContext";
 import { ApiError } from "../../lib/api";
-import { formatPrice } from "../../lib/format";
+import { cloudinaryResize, formatPrice } from "../../lib/format";
 import type { AdminProduct, Category, ProductFormInput } from "../../lib/types";
 
 const emptyForm: ProductFormInput = {
@@ -368,7 +368,7 @@ const Products: React.FC = () => {
               <div className="ms-product-form__images">
                 {form.images.map((url) => (
                   <div key={url} className="ms-product-form__image">
-                    <img src={url} alt="" />
+                    <img src={cloudinaryResize(url, 200)} alt="" />
                     <button type="button" onClick={() => removeImage(url)} aria-label="Удалить фото">
                       ✕
                     </button>
@@ -415,7 +415,7 @@ const Products: React.FC = () => {
                 <td>
                   {p.images[0] && (
                     <img
-                      src={p.images[0]}
+                      src={cloudinaryResize(p.images[0], 100)}
                       alt={p.title}
                       style={{ width: 44, height: 56, objectFit: "cover" }}
                     />
