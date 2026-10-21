@@ -155,6 +155,11 @@
     position: relative;
     background: none;
     border: none;
+    // Browsers give <button> a default ~1px/6px padding that <a> (the
+    // favorites link next to it, sharing this class) doesn't get — left in
+    // place, it squeezed this icon's flex box narrower than the heart's,
+    // which is why the cart glyph was rendering visibly smaller.
+    padding: 0;
     color: var(--bone);
     width: 26px;
     height: 26px;
