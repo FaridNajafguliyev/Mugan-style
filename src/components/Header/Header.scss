@@ -14,6 +14,13 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid transparent;
 
+  // Home page only, before scrolling past the hero photo — floats over it
+  // with no bar at all instead of a dark strip across the top.
+  &.is-transparent {
+    background: transparent;
+    backdrop-filter: none;
+  }
+
   &__bar {
     display: flex;
     align-items: center;

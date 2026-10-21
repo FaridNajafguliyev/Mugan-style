@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useFavorites } from "../../context/FavoritesContext";
 import "./Header.scss";
@@ -13,6 +13,7 @@ const links = [
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { count, open: openCart } = useCart();
   const { ids: favoriteIds } = useFavorites();
   const [open, setOpen] = useState(false);
@@ -25,6 +26,12 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Only the home page opens on a full-bleed hero photo dark enough for the
+  // header to float over transparently — everywhere else goes straight into
+  // page content, so the solid bar stays from the start there.
+  const isHome = location.pathname === "/";
+  const transparent = isHome && !scrolled;
+
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
   }, [open]);
@@ -32,7 +39,7 @@ const Header: React.FC = () => {
   const close = () => setOpen(false);
 
   return (
-    <header className={`ms-header ${scrolled ? "is-scrolled" : ""}`}>
+    <header className={`ms-header ${scrolled ? "is-scrolled" : ""} ${transparent ? "is-transparent" : ""}`}>
       <div className="ms-header__bar container">
         <NavLink to="/" className="ms-header__brand" onClick={close}>
           <span className="ms-header__brand-mark">MS</span>
