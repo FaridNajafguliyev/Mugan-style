@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Reveal from "../components/Reveal/Reveal";
 import ProductCard from "../components/ProductCard/ProductCard";
-import { apiFetch } from "../lib/api";
+import { apiFetch, ApiError } from "../lib/api";
 import type { Product } from "../lib/types";
 import "./Catalog.scss";
 
 const Catalog: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
+    setError(null);
     apiFetch<{ products: Product[] }>("/products")
       .then((data) => setProducts(data.products))
-      .catch(() => setProducts([]));
-  }, []);
+      .catch((err) => {
+        setProducts([]);
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : "Не удалось загрузить каталог — сервер мог ещё не проснуться, попробуйте ещё раз",
+        );
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
 
   return (
     <div className="ms-catalog-page">
@@ -30,13 +44,26 @@ const Catalog: React.FC = () => {
         </div>
       </section>
 
-      <section className="ms-catalog-grid container">
-        {products.map((p, i) => (
-          <Reveal key={p.id} delay={(i % 3) * 90}>
-            <ProductCard product={p} />
-          </Reveal>
-        ))}
-      </section>
+      {loading ? (
+        <p className="ms-catalog-status container">Загрузка…</p>
+      ) : error ? (
+        <div className="ms-catalog-status container">
+          <p>{error}</p>
+          <button className="btn" onClick={load}>
+            Попробовать снова
+          </button>
+        </div>
+      ) : products.length === 0 ? (
+        <p className="ms-catalog-status container">Пока нет товаров в этой категории.</p>
+      ) : (
+        <section className="ms-catalog-grid container">
+          {products.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 3) * 90}>
+              <ProductCard product={p} />
+            </Reveal>
+          ))}
+        </section>
+      )}
     </div>
   );
 };

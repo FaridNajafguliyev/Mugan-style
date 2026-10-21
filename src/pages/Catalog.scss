@@ -36,3 +36,14 @@
   @media (max-width: 560px) { grid-template-columns: 1fr; }
 }
 
+.ms-catalog-status {
+  padding-top: clamp(60px, 9vw, 110px);
+  padding-bottom: clamp(90px, 11vw, 140px);
+  text-align: center;
+  color: var(--sand-dim);
+
+  .btn {
+    margin-top: 18px;
+  }
+}
+
