@@ -18,6 +18,32 @@ const emptyForm: ProductFormInput = {
   images: [],
 };
 
+const DRAFT_KEY = "mugan_admin_product_draft";
+
+interface ProductDraft {
+  editingId: string | null;
+  duplicateSourceTitle: string | null;
+  form: ProductFormInput;
+  priceRubles: string;
+  oldPriceRubles: string;
+}
+
+function readDraft(): ProductDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? (JSON.parse(raw) as ProductDraft) : null;
+  } catch {
+    return null;
+  }
+}
+
+function isDraftWorthKeeping(d: Pick<ProductDraft, "form" | "priceRubles">): boolean {
+  const f = d.form;
+  return Boolean(
+    f.title || f.material || f.lining || f.color || f.sizes || f.description || f.images.length || d.priceRubles,
+  );
+}
+
 const Products: React.FC = () => {
   const { authFetch } = useAdminAuth();
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -35,6 +61,7 @@ const Products: React.FC = () => {
   const [listError, setListError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [duplicateSourceTitle, setDuplicateSourceTitle] = useState<string | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
@@ -52,7 +79,46 @@ const Products: React.FC = () => {
 
   useEffect(load, [authFetch]);
 
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // localStorage unavailable (private mode etc.) — nothing to clear
+    }
+  };
+
+  // Restores whatever was being typed if the admin left this page (or
+  // closed the tab) mid-edit without clicking Сохранить — e.g. after
+  // switching to Склад to check a size and coming back.
+  useEffect(() => {
+    const d = readDraft();
+    if (d && isDraftWorthKeeping(d)) {
+      setEditingId(d.editingId);
+      setDuplicateSourceTitle(d.duplicateSourceTitle);
+      setForm(d.form);
+      setPriceRubles(d.priceRubles);
+      setOldPriceRubles(d.oldPriceRubles);
+      setFormOpen(true);
+      setDraftRestored(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!formOpen) return;
+    const draft: ProductDraft = { editingId, duplicateSourceTitle, form, priceRubles, oldPriceRubles };
+    if (isDraftWorthKeeping(draft)) {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // localStorage unavailable — form still works, just without autosave
+      }
+    }
+  }, [formOpen, editingId, duplicateSourceTitle, form, priceRubles, oldPriceRubles]);
+
   const openCreateForm = () => {
+    clearDraft();
+    setDraftRestored(false);
     setEditingId(null);
     setDuplicateSourceTitle(null);
     setForm({ ...emptyForm, categoryKey: categories[0]?.key ?? "" });
@@ -63,6 +129,8 @@ const Products: React.FC = () => {
   };
 
   const openEditForm = (p: AdminProduct) => {
+    clearDraft();
+    setDraftRestored(false);
     setEditingId(p.id);
     setDuplicateSourceTitle(null);
     setForm({
@@ -89,6 +157,8 @@ const Products: React.FC = () => {
   // Duplicating pre-fills everything except photos (always new) so the
   // admin only has to adjust what's actually different.
   const openDuplicateForm = (p: AdminProduct) => {
+    clearDraft();
+    setDraftRestored(false);
     setEditingId(null);
     setDuplicateSourceTitle(p.title);
     setForm({
@@ -110,7 +180,11 @@ const Products: React.FC = () => {
     setFormOpen(true);
   };
 
-  const closeForm = () => setFormOpen(false);
+  const closeForm = () => {
+    clearDraft();
+    setDraftRestored(false);
+    setFormOpen(false);
+  };
 
   const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -173,6 +247,8 @@ const Products: React.FC = () => {
           body: JSON.stringify(payload),
         });
       }
+      clearDraft();
+      setDraftRestored(false);
       setFormOpen(false);
       load();
     } catch (err) {
@@ -222,6 +298,12 @@ const Products: React.FC = () => {
                 ? `Новый товар (на основе «${duplicateSourceTitle}»)`
                 : "Новый товар"}
           </h3>
+          {draftRestored && (
+            <p className="ms-product-form__note">
+              Восстановлены несохранённые данные с прошлого раза — проверьте и нажмите «Сохранить»,
+              либо «Отмена», чтобы начать заново.
+            </p>
+          )}
           <form className="ms-product-form" onSubmit={handleSubmit}>
             <div className="ms-product-form__row">
               <label>
