@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { login, refresh, logout, createUser } from "../controllers/auth.controller.js";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.js";
+import { loginRateLimit } from "../middleware/rateLimit.middleware.js";
 
 const router = Router();
 
-router.post("/login", login);
+router.post("/login", loginRateLimit, login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 
