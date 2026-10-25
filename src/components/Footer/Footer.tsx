@@ -41,6 +41,9 @@ const Footer: React.FC = () => {
       <div className="container ms-footer__bottom">
         <span>© {new Date().getFullYear()} Mugan Style. Все права защищены.</span>
         <NavLink to="/requisites">Реквизиты</NavLink>
+        <NavLink to="/oferta">Оферта</NavLink>
+        <NavLink to="/privacy">Конфиденциальность</NavLink>
+        <NavLink to="/returns">Возврат и обмен</NavLink>
         <span>Москва</span>
       </div>
     </footer>

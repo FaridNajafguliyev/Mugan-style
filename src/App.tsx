@@ -17,6 +17,9 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderResult = lazy(() => import("./pages/OrderResult"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 const Requisites = lazy(() => import("./pages/Requisites"));
+const Offer = lazy(() => import("./pages/Offer"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminLogin = lazy(() => import("./pages/admin/Login"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -53,6 +56,9 @@ const App: React.FC = () => {
             <Route path="/order/:orderNumber/result" element={<OrderResult />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/requisites" element={<Requisites />} />
+            <Route path="/oferta" element={<Offer />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/returns" element={<ReturnPolicy />} />
           </Route>
 
           <Route path="/admin/login" element={<AdminLogin />} />

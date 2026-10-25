@@ -1,0 +1,80 @@
+@use "../styles/tokens.scss";
+
+.ms-legal-page {
+  background: var(--paper);
+  min-height: 60vh;
+}
+
+.ms-legal-hero {
+  background: var(--ink);
+  color: var(--bone);
+  padding: clamp(150px, 18vw, 210px) 0 70px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(34px, 5.6vw, 58px);
+    margin-top: 16px;
+    em {
+      font-style: italic;
+      color: var(--gold-bright);
+    }
+  }
+
+  p {
+    margin-top: 14px;
+    color: var(--bone-dim);
+    font-size: 14px;
+  }
+}
+
+.ms-legal-body {
+  padding: clamp(60px, 9vw, 110px) var(--gutter);
+  display: flex;
+  justify-content: center;
+}
+
+.ms-legal-content {
+  max-width: 760px;
+  width: 100%;
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(20px, 2.6vw, 26px);
+    color: var(--ink);
+    margin-top: 44px;
+
+    &:first-child { margin-top: 0; }
+  }
+
+  p {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--sand-dim);
+  }
+
+  ol, ul {
+    margin-top: 14px;
+    padding-left: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--sand-dim);
+  }
+
+  a {
+    color: var(--gold);
+    text-decoration: underline;
+    transition: color var(--dur-fast);
+    &:hover { color: var(--ink); }
+  }
+
+  strong { color: var(--ink); font-weight: 600; }
+}
