@@ -1,14 +1,21 @@
 import React, { useState } from "react";
+import { useCart } from "../../context/CartContext";
 import "./WhatsApp.scss";
 
 const WhatsApp: React.FC = () => {
   const [hovered, setHovered] = useState(false);
+  const { isOpen: cartOpen } = useCart();
   const phone = "79265939880";
   const message = encodeURIComponent("Здравствуйте! Хочу узнать подробнее о вашей коллекции.");
   const url = `https://wa.me/${phone}?text=${message}`;
 
+  // Sits bottom-right, same corner as the cart drawer's "Оформить заказ"
+  // button — left showing while the drawer is open, it overlapped that
+  // button and could catch an accidental tap meant for checkout.
+  if (cartOpen) return null;
+
   return (
-    
+
       <a href={url}
       target="_blank"
       rel="noopener noreferrer"
