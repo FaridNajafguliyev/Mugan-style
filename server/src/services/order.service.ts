@@ -5,6 +5,7 @@ import { Customer } from "../models/Customer.js";
 import { OrderStatusHistory } from "../models/OrderStatusHistory.js";
 import { nextOrderNumber } from "./counter.service.js";
 import * as inventoryService from "./inventory.service.js";
+import { sendOrderConfirmationEmail } from "./email.service.js";
 import { AppError } from "../utils/AppError.js";
 import { VALID_TRANSITIONS, type OrderStatus } from "../types/order.js";
 
@@ -142,6 +143,21 @@ export async function changeStatus(
     changedByLabel: actor.label,
     note,
   });
+
+  if (fromStatus === "PENDING_PAYMENT" && toStatus === "NEW") {
+    const customer = await Customer.findById(order.customer).lean();
+    if (customer?.email) {
+      // Not awaited — a slow or failing SMTP call must never delay the
+      // response to the webhook/admin action that confirmed the order.
+      void sendOrderConfirmationEmail(customer.email, {
+        orderNumber: order.orderNumber,
+        contactName: order.contactName,
+        totalKopecks: order.totalKopecks,
+        items: order.items,
+        deliveryAddress: order.deliveryAddress,
+      });
+    }
+  }
 
   return order;
 }

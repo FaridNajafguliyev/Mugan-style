@@ -32,6 +32,7 @@ const Checkout: React.FC = () => {
           items: items.map((i) => ({ productId: i.id, size: i.size, qty: i.qty })),
           contactName: String(form.get("name") ?? ""),
           contactPhone: String(form.get("phone") ?? ""),
+          customerEmail: String(form.get("email") ?? "") || undefined,
           deliveryAddress: {
             city: String(form.get("city") ?? ""),
             street: String(form.get("street") ?? ""),
@@ -108,6 +109,10 @@ const Checkout: React.FC = () => {
                 <label>
                   Телефон
                   <input type="tel" name="phone" required placeholder="+7 ___ ___ __ __" />
+                </label>
+                <label>
+                  Email (необязательно)
+                  <input type="email" name="email" placeholder="Для подтверждения заказа" />
                 </label>
                 <div className="ms-checkout-form__row">
                   <label>
