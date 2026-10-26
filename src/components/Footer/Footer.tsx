@@ -31,9 +31,9 @@ const Footer: React.FC = () => {
           <a href="mailto:rafael-1969@mail.ru">ПОЧТА: rafael-1969@mail.ru</a>
 
           <div className="ms-footer__socials">
-            <a href="#" aria-label="Instagram">Instagram</a>
-            <a href="#" aria-label="WhatsApp">WhatsApp</a>
-            <a href="#" aria-label="Telegram">Telegram</a>
+            <a href="https://www.instagram.com/mugan_style" target="_blank" rel="noopener noreferrer" aria-label="Instagram">Instagram</a>
+            <a href="https://wa.me/79265939880" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">WhatsApp</a>
+            <a href="https://t.me/muganstyle" target="_blank" rel="noopener noreferrer" aria-label="Telegram">Telegram</a>
           </div>
         </div>
       </div>
