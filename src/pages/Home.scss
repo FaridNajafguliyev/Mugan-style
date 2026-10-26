@@ -359,6 +359,11 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     padding: 6px 11px;
+
+    // Sat right over the model's face on a narrow mobile card.
+    @media (max-width: 900px) {
+      display: none;
+    }
   }
 
   &__fav {

@@ -94,7 +94,9 @@
   // Two cards per row below 900px (see Catalog.scss) leaves less width per
   // card, so the same font sizes as a 3-4up desktop grid read oversized.
   @media (max-width: 900px) {
-    &__tag { font-size: 9px; padding: 5px 9px; }
+    // Was sitting right over the model's face on a narrow 2-up card —
+    // dropped since the category ("Дублёнки") already repeats below.
+    &__tag { display: none; }
     &__category { font-size: 10px; }
     &__title-row h3 { font-size: 17px; }
     &__price { font-size: 15px; }
